@@ -1,5 +1,5 @@
-from sqlalchemy.orm import declarative_base, sessionmaker, relationship
-from sqlalchemy import Column, Integer, String, ForeignKey, create_engine
+from sqlalchemy.orm import declarative_base, relationship
+from sqlalchemy import Column, Integer, String, ForeignKey, UniqueConstraint
 
 # Создаем базовый класс
 Base = declarative_base()
@@ -22,37 +22,17 @@ class Module(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     module_name = Column(String, nullable=False, unique=True)
+    description = Column(String, nullable=True, default="No description this modul")
     commands = relationship('Command', secondary='command_module_association', back_populates='modules')
 
 
 # Модель таблицы связей таблиц: Модуль-Команда/ Команда-Модуль
 class CommandModuleAssociation(Base):
     __tablename__ = 'command_module_association'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    command_id = Column(Integer, ForeignKey('commands.id'), nullable=False)
+    module_id = Column(Integer, ForeignKey('modules.id'), nullable=False)
 
-    command_id = Column(Integer, ForeignKey('commands.id'), primary_key=True)
-    module_id = Column(Integer, ForeignKey('modules.id'), primary_key=True)
-
-
-# Функция для создания БД db-notebook (sqlite3)
-def create_database():
-    # Создаем соединение с базой данных
-    engine = create_engine('sqlite:///db_notebook.db', echo=True)
-    # Создаем сессию для взаимодействия с базой данных
-    Session = sessionmaker(bind=engine)
-    session = Session()
-    try:
-        # Создаем таблицы в базе данных
-        Base.metadata.create_all(engine)
-        # Сохранение изменений в базе данных
-        session.commit()
-    except Exception as e:
-        print(f'Ошибка при создании БД:\n{str(e)}')
-        session.rollback()  # Откатываем изменения в случае ошибки
-    finally:
-        # Закрываем соединение с базой данных, чтобы избежать утечек ресурсов
-        session.close()
-
-
-if __name__ == "__main__":
-    # Создаем БД если есть необходимость
-    create_database()
+    __table_args__ = (
+        UniqueConstraint('command_id', 'module_id'),
+    )
