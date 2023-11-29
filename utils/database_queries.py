@@ -66,9 +66,6 @@ def request_to_get_all_commands(modul_name=None):
             return []
 
 
-
-
-
 def show_full_command_info(command_name=None):
     """Получение полной информации о команде из БД"""
     with Session() as session:
@@ -95,18 +92,14 @@ def show_full_command_info(command_name=None):
 
 
 if __name__ == "__main__":
-    # # Вызываем функцию и получаем данные о всех модулях
-    # all_modules_data = request_to_get_all_modules()
-    # # Выводим результат
-    # print("Data for all modules:")
-    # for module_data in all_modules_data:
-    #     print(module_data)
-    #
-    # # Вызываем функцию и получаем данные о всех командах
-    # all_cmd_module = request_to_get_all_commands('string')
-    # print("=====================================")
-    # for cmd_data in all_cmd_module:
-    #     print(cmd_data)
+    # Вызываем функцию и получаем данные о всех модулях
+    all_modules_data = request_to_get_all_modules()
+    # Выводим результат
+    print("Data for all modules:")
+    for module_data in all_modules_data:
+        print(module_data)
 
-    # Вызываем функцию и получаем данные о конкретной команде
-    show_full_command_info('list.append(x)')
+    # Вызываем функцию и получаем данные о всех командах
+    all_cmd_module = request_to_get_all_commands('string')
+    for cmd_data in all_cmd_module:
+        print(cmd_data)

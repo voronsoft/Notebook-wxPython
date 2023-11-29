@@ -11,7 +11,7 @@ class ViewCommandData(wx.Dialog):
 
     def __init__(self, parent):
         wx.Dialog.__init__(self, parent, id=wx.ID_ANY, title='Данные о команде', pos=wx.DefaultPosition, size=wx.Size(600, 600), style=wx.DEFAULT_DIALOG_STYLE | wx.MAXIMIZE_BOX | wx.MINIMIZE_BOX)
-        # Задаем параметры шрифта по умолчанию
+        # Задаем параметры шрифта
         font = wx.Font(12, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
         self.SetFont(font)
 
@@ -26,7 +26,7 @@ class ViewCommandData(wx.Dialog):
         self.command_label.Wrap(-1)
         bSizer2_a.Add(self.command_label, 0, wx.ALL, 5)
         self.command_db_label = wx.StaticText(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0)
-        self.command_db_label.SetFont(wx.Font(12, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False, "Arial"))
+        self.command_db_label.SetFont(wx.Font(12, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
         self.command_db_label.SetForegroundColour(wx.Colour(255, 0, 0))  # RGB цвет для красного
         self.command_db_label.Wrap(-1)
 
@@ -37,12 +37,10 @@ class ViewCommandData(wx.Dialog):
         self.modul_label.Wrap(-1)
         bSizer2_b.Add(self.modul_label, 0, wx.ALL, 5)
         self.modul_db_label = wx.StaticText(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0)
-        self.modul_db_label.SetFont(wx.Font(12, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False, "Arial"))
+        self.modul_db_label.SetFont(wx.Font(12, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
         self.modul_db_label.SetForegroundColour(wx.Colour(255, 0, 0))  # RGB цвет красный
         self.modul_db_label.Wrap(-1)
-        # ----
 
-        # ----
         bSizer2_b.Add(self.modul_db_label, 0, wx.ALL, 5)
         sizer_top.Add(bSizer2_b, 1, wx.EXPAND, 5)
         sizer_main.Add(sizer_top, 0, wx.ALL | wx.EXPAND, 5)
@@ -74,7 +72,7 @@ class ViewCommandData(wx.Dialog):
         bSizer4.Add(bSizer4_a, 0, wx.EXPAND, 5)
         bSizer4_b = wx.BoxSizer(wx.VERTICAL)
         self.example_text = wx.richtext.RichTextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition,
-                                                     wx.DefaultSize, 0  | wx.BORDER_THEME | wx.HSCROLL | wx.VSCROLL | wx.WANTS_CHARS)
+                                                     wx.DefaultSize, 0 | wx.BORDER_THEME | wx.HSCROLL | wx.VSCROLL | wx.WANTS_CHARS)
         self.example_text.SetFont(wx.Font(12, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
         self.example_text.SetEditable(False)  # Делаем текст только для чтения
 

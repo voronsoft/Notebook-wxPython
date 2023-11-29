@@ -30,7 +30,8 @@ class FrameMain(wx.Frame):
     """
 
     def __init__(self, parent):
-        wx.Frame.__init__(self, parent, id=wx.ID_ANY, title="Блокнот команд", pos=wx.Point(0, 0), size=wx.Size(-1, -1), style=wx.DEFAULT_FRAME_STYLE | wx.MAXIMIZE_BOX | wx.TAB_TRAVERSAL)
+        wx.Frame.__init__(self, parent, id=wx.ID_ANY, title="Блокнот команд", pos=wx.Point(0, 0), size=wx.Size(-1, -1),
+                          style=wx.DEFAULT_FRAME_STYLE | wx.MAXIMIZE_BOX | wx.TAB_TRAVERSAL)
         # Устанавливаем пропорциональность окна в зависимости от разности разрешений мониторов
         # Это гарантирует что окно при запуске программы не будет больше самого разрешения монитора
         # и не будет сжато до состояния искажения контента в окне

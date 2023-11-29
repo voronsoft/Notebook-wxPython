@@ -26,7 +26,7 @@ class Module(Base):
     commands = relationship('Command', secondary='command_module_association', back_populates='modules')
 
 
-# Модель таблицы связей таблиц: Модуль-Команда/ Команда-Модуль
+# Модель таблицы связей таблиц: Модуль-Команда/Команда-Модуль
 class CommandModuleAssociation(Base):
     __tablename__ = 'command_module_association'
     id = Column(Integer, primary_key=True, autoincrement=True)
