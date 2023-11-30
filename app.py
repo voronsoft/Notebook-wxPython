@@ -1,7 +1,7 @@
 import wx
 import wx.xrc
 from dialog_window.search_dialog import SearchDialog
-from dialog_window.add_data_dialog import AddDataDialog
+from dialog_window.edit_data_dialog import EditCommandData
 from dialog_window.panel_center_dialog import PanelCenter
 from dialog_window.about_program_dialog import AboutProgram
 
@@ -105,7 +105,7 @@ class FrameMain(wx.Frame):
     # ---------------- Обработчик события для кнопки "Добавить данные" ---------------
     def on_add_data_button_click(self, event):
         """Открытие диалога добавить данные"""
-        dialog = AddDataDialog(self)
+        dialog = EditCommandData(self)
         dialog.ShowModal()
         dialog.Destroy()
 

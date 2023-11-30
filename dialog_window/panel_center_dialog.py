@@ -1,5 +1,7 @@
 import wx
 import wx.xrc
+
+from dialog_window.edit_data_dialog import EditCommandData
 from utils.database_queries import request_to_get_all_modules, request_to_get_all_commands, show_full_command_info
 from dialog_window.view_command_dialog import ViewCommandData
 
@@ -70,7 +72,6 @@ class PanelCenter(wx.Panel):
                 # - Копировать - в буфер обмена
                 # - Подробно - открывает окно с подробной информацией
                 text_ctrl_command.Bind(wx.EVT_RIGHT_DOWN, lambda event, cmd=command: self.show_context_menu(cmd))
-                # text_ctrl_description.Bind(wx.EVT_RIGHT_DOWN, lambda event, cmd=command['description_command']: self.show_context_menu(cmd))
 
             page.SetSizer(sizer_window_Modul)
             page.Layout()
@@ -103,6 +104,10 @@ class PanelCenter(wx.Panel):
         show_item = context_menu.Append(wx.ID_ANY, "Подробно")
         self.Bind(wx.EVT_MENU, lambda event, cmd=data: self.show_command_details(cmd), show_item)
 
+        # Добавляем опцию "Изменить"
+        edit_item = context_menu.Append(wx.ID_ANY, "Изменить")
+        self.Bind(wx.EVT_MENU, lambda event, cmd=data: self.edit_command(cmd), edit_item)
+
         # Показываем контекстное меню
         self.PopupMenu(context_menu)
         context_menu.Destroy()
@@ -114,3 +119,16 @@ class PanelCenter(wx.Panel):
         if wx.TheClipboard.Open():
             wx.TheClipboard.SetData(clipboard_data)
             wx.TheClipboard.Close()
+
+    # Обработчик для опции "Изменить"
+    def edit_command(self, command):
+        """Функция для редактирования команды"""
+        edit_dialog = EditCommandData(self)  # Создаем экземпляр класса
+        # Задаем полям значения
+        edit_dialog.cmd_data_name.SetLabel(command['commands_name'])  # Имя
+        edit_dialog.mod_data_name.SetLabel(command['cmd_assoc_module'][0])  # Модуль родитель
+        edit_dialog.description_data.WriteText(command['description_command'])  # Описание
+        edit_dialog.example_data.WriteText(command['command_example:'])  # Пример
+        edit_dialog.ShowModal()
+        edit_dialog.Destroy()
+
