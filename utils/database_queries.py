@@ -1,8 +1,7 @@
-# Импортируем необходимые модули
 import os
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 from db.models import Module, Command
+from sqlalchemy.orm import sessionmaker
 
 # Получаем корневую директорию проекта
 root_directory = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -13,7 +12,7 @@ engine = create_engine(f'sqlite:///{path_to_DB}', echo=True)  # Создаем �
 Session = sessionmaker(bind=engine)  # Создаем сессию для взаимодействия с базой данных
 
 
-# Функция для выполнения запроса и получения данных о всех модулях
+# Функция для выполнения запроса и получения данных о модулях
 def request_to_get_all_modules(command=None):
     """Получение списка модулей из БД"""
     with Session() as session:
@@ -35,6 +34,7 @@ def request_to_get_all_modules(command=None):
             return []
 
 
+# Функция для выполнения запроса и получения данных о командах
 def request_to_get_all_commands(modul_name=None):
     """Получение списка команд исходя из названия модуля. Если модуля нет выбираем всё"""
     with Session() as session:
@@ -66,6 +66,7 @@ def request_to_get_all_commands(modul_name=None):
             return []
 
 
+# Функция для выполнения запроса для получения данных о конкретной команде
 def show_full_command_info(command_name=None):
     """Получение полной информации о команде из БД"""
     with Session() as session:
@@ -91,15 +92,51 @@ def show_full_command_info(command_name=None):
             return []
 
 
-if __name__ == "__main__":
-    # Вызываем функцию и получаем данные о всех модулях
-    all_modules_data = request_to_get_all_modules()
-    # Выводим результат
-    print("Data for all modules:")
-    for module_data in all_modules_data:
-        print(module_data)
+# Функция добавления новой КОМАНДЫ
+def add_command(name, description, example, modules):
+    """Функция добавления новой КОМАНДЫ"""
+    ...
 
-    # Вызываем функцию и получаем данные о всех командах
-    all_cmd_module = request_to_get_all_commands('string')
-    for cmd_data in all_cmd_module:
-        print(cmd_data)
+
+# Функция изменения данных КОМАНДЫ
+def edit_command(name, description, example, modules):
+    """Функция изменения данных КОМАНДЫ"""
+    ...
+
+
+# Функция удаления КОМАНДЫ
+def del_command(name_cmd):
+    """Функция удаления КОМАНДЫ"""
+    ...
+
+
+# Функция добавления нового МОДУЛЯ
+def add_module(name, description, commands):
+    """Функция добавления нового МОДУЛЯ"""
+    ...
+
+
+# Функция изменения данных МОДУЛЯ
+def edit_module(name, description):
+    """Функция изменения данных МОДУЛЯ"""
+    ...
+
+
+# Функция удаления МОДУЛЯ и связанных с ним команд.
+def del_module(name_mod):
+    """Функция удаления МОДУЛЯ и связанных с ним команд."""
+    ...
+
+# #Проверка отрабатывает ли код заданные функции
+# if __name__ == "__main__":
+# # Вызываем функцию и получаем данные о всех модулях
+# all_modules_data = request_to_get_all_modules()
+# # Выводим результат
+# print("Data for all modules:")
+# for module_data in all_modules_data:
+#     print(module_data)
+#
+# # Вызываем функцию и получаем данные о всех командах
+# all_cmd_module = request_to_get_all_commands('string')
+# for cmd_data in all_cmd_module:
+#     print(cmd_data)

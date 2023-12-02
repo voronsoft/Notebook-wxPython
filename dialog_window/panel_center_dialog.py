@@ -1,7 +1,7 @@
 import wx
 import wx.xrc
 
-from dialog_window.edit_data_dialog import EditCommandData
+from dialog_window.add_data_dialog import PanelEditCommand, AddCommandOrModule
 from utils.database_queries import request_to_get_all_modules, request_to_get_all_commands, show_full_command_info
 from dialog_window.view_command_dialog import ViewCommandData
 
@@ -18,7 +18,6 @@ class PanelCenter(wx.Panel):
         SizerPanel = wx.BoxSizer(wx.VERTICAL)
 
         self.notebook = wx.Notebook(self, wx.ID_ANY, wx.DefaultPosition, wx.Size(-1, -1), 0)
-
         SizerPanel.Add(self.notebook, 1, wx.EXPAND | wx.ALL, 5)
 
         self.SetSizer(SizerPanel)
@@ -123,12 +122,25 @@ class PanelCenter(wx.Panel):
     # Обработчик для опции "Изменить"
     def edit_command(self, command):
         """Функция для редактирования команды"""
-        edit_dialog = EditCommandData(self)  # Создаем экземпляр класса
+        edit_dialog = AddCommandOrModule(parent=self)  # Создаем экземпляр класса
+        # делаем активной радиокнопку Изменить КОМАНДУ
+        edit_dialog.radio_edit_command.SetValue(True)
+        # Отключаем активность кнопок
+        edit_dialog.radio_add_command.Enable(False)
+        edit_dialog.radio_add_module.Enable(False)
+        # Явно вызываем обработчик, чтобы загрузить соответствующую панель в динамический сайзер
+        edit_dialog.on_radio_change(None)
+
         # Задаем полям значения
-        edit_dialog.cmd_data_name.SetLabel(command['commands_name'])  # Имя
-        edit_dialog.mod_data_name.SetLabel(command['cmd_assoc_module'][0])  # Модуль родитель
-        edit_dialog.description_data.WriteText(command['description_command'])  # Описание
-        edit_dialog.example_data.WriteText(command['command_example:'])  # Пример
+        # Устанавливаем значения в поля динамической панели
+        edit_dialog.sizer_DYNAMIC.GetChildren()[0].GetWindow().set_values(command['commands_name'],
+                                                                          command['cmd_assoc_module'][0],
+                                                                          command['description_command'],
+                                                                          command['command_example:'])
+        # edit_dialog.cmd_data_name.SetLabel(command['commands_name'])  # Имя
+        # edit_dialog.mod_data_name.SetLabel(command['cmd_assoc_module'][0])  # Модуль родитель
+        # edit_dialog.description_data.WriteText(command['description_command'])  # Описание
+        # edit_dialog.example_data.WriteText(command['command_example:'])  # Пример
+
         edit_dialog.ShowModal()
         edit_dialog.Destroy()
-

@@ -1,7 +1,8 @@
 import wx
 import wx.xrc
+
+from dialog_window.add_data_dialog import AddCommandOrModule, PanelEditCommand
 from dialog_window.search_dialog import SearchDialog
-from dialog_window.edit_data_dialog import EditCommandData
 from dialog_window.panel_center_dialog import PanelCenter
 from dialog_window.about_program_dialog import AboutProgram
 
@@ -45,6 +46,8 @@ class FrameMain(wx.Frame):
         menu_bar = wx.MenuBar()
         # Меню "Файл"
         file_menu = wx.Menu()
+        add_data_menu_item = file_menu.Append(wx.ID_ANY, "Добавить данные", "Добавить Команду или Модуль")
+        self.Bind(wx.EVT_MENU, self.add_data_button_click, add_data_menu_item)
         exit_menu_item = file_menu.Append(wx.ID_EXIT, "Выход", "Закрыть программу")
         self.Bind(wx.EVT_MENU, self.close_program, exit_menu_item)
         menu_bar.Append(file_menu, "Файл")
@@ -98,14 +101,14 @@ class FrameMain(wx.Frame):
         self.Maximize()  # Максимизируем окно на весь экран
 
         # Подключение обработчиков
-        self.add_button_data.Bind(wx.EVT_LEFT_DOWN, self.on_add_data_button_click)
+        self.add_button_data.Bind(wx.EVT_LEFT_DOWN, self.add_data_button_click)
         self.show_button.Bind(wx.EVT_LEFT_DOWN, self.search)
         self.close_button.Bind(wx.EVT_LEFT_DOWN, self.close_program)
 
-    # ---------------- Обработчик события для кнопки "Добавить данные" ---------------
-    def on_add_data_button_click(self, event):
-        """Открытие диалога добавить данные"""
-        dialog = EditCommandData(self)
+    # ---------------- Обработчики события---------------
+    def add_data_button_click(self, event):
+        """Открытие диалога добавить данные о команде или модуле"""
+        dialog = AddCommandOrModule(self)
         dialog.ShowModal()
         dialog.Destroy()
 
@@ -116,7 +119,7 @@ class FrameMain(wx.Frame):
         dialog.ShowModal()
         dialog.Destroy()
 
-    # Обработчики событий для пунктов меню
+    # ----------------  Обработчики событий для пунктов системного меню ----------------
     def show_documentation(self, event):
         """Открытие диалога документации"""
         pass
@@ -127,10 +130,15 @@ class FrameMain(wx.Frame):
         dialog.ShowModal()
         dialog.Destroy()
 
-    # Обработчик для кнопки "ВЫХОД"
     def close_program(self, event):
         """Закрытие программы"""
-        self.Close()
+        self.Destroy()
+
+    def add_cmd_mod_data(self):
+        """Открытие диалога для добавления данных в программу"""
+        dialog = AddCommandOrModule(self)
+        dialog.ShowModal()
+        dialog.Destroy()
 
 
 if __name__ == '__main__':
