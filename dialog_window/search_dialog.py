@@ -34,8 +34,8 @@ class SearchDialog(wx.Dialog):
         sizer_top.Add(self.searchCtrl, 0, wx.EXPAND | wx.TOP | wx.BOTTOM | wx.LEFT, 5)
         sizer_top.Add(self.search_button, 0, wx.EXPAND | wx.TOP | wx.BOTTOM, 4)
         # Привязываем обработчик события
-        self.search_button.Bind(wx.EVT_BUTTON, self.on_search_button_click)
-        self.searchCtrl.Bind(wx.EVT_SEARCH, self.on_search_button_click)
+        self.search_button.Bind(wx.EVT_BUTTON, self.on__click)
+        self.searchCtrl.Bind(wx.EVT_SEARCH, self.on__click)
 
         sizer_main.Add(sizer_top, 0, wx.ALL | wx.EXPAND, 5)
 
@@ -96,7 +96,7 @@ class SearchDialog(wx.Dialog):
         self.Centre(wx.BOTH)
 
     # Обработчики
-    def on_search_button_click(self, event):
+    def on__click(self, event):
         """Функция поиска"""
         self.description_text.Clear()  # Очистка поля описания команды
         input_text_search = self.searchCtrl.GetValue()  # Получаем текст в строке поиска

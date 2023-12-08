@@ -1,10 +1,10 @@
 import wx
 import wx.xrc
-
-from dialog_window.add_data_dialog import AddCommandOrModule, PanelEditCommand
 from dialog_window.search_dialog import SearchDialog
+from dialog_window.del_data_dialog import DelCmdOrMod
 from dialog_window.panel_center_dialog import PanelCenter
 from dialog_window.about_program_dialog import AboutProgram
+from dialog_window.add_data_dialog import AddCommandOrModule
 
 
 ###########################################################################
@@ -68,14 +68,21 @@ class FrameMain(wx.Frame):
         # Сайзер - TOP
         sizer_top_button = wx.BoxSizer(wx.HORIZONTAL)
         sizer_top_button.SetMinSize(wx.Size(600, 50))
+
         self.add_button_data = wx.Button(self, wx.ID_ANY, "Добавить данные", wx.DefaultPosition, wx.DefaultSize, 0)
         self.add_button_data.SetLabelMarkup("Добавить данные")
         self.add_button_data.SetFont(wx.Font(14, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
         sizer_top_button.Add(self.add_button_data, 1, wx.ALL | wx.EXPAND, 5)
-        self.show_button = wx.Button(self, wx.ID_ANY, "Поиск", wx.DefaultPosition, wx.DefaultSize, 0)
-        self.show_button.SetLabelMarkup("Поиск")
-        self.show_button.SetFont(wx.Font(14, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
-        sizer_top_button.Add(self.show_button, 1, wx.ALL | wx.EXPAND, 5)
+
+        self.del_button_data = wx.Button(self, wx.ID_ANY, "Удалить данные", wx.DefaultPosition, wx.DefaultSize, 0)
+        self.del_button_data.SetLabelMarkup("Удалить данные")
+        self.del_button_data.SetFont(wx.Font(14, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
+        sizer_top_button.Add(self.del_button_data, 1, wx.ALL | wx.EXPAND, 5)
+
+        self.search_button = wx.Button(self, wx.ID_ANY, "Поиск", wx.DefaultPosition, wx.DefaultSize, 0)
+        self.search_button.SetLabelMarkup("Поиск")
+        self.search_button.SetFont(wx.Font(14, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
+        sizer_top_button.Add(self.search_button, 1, wx.ALL | wx.EXPAND, 5)
         sizerMain.Add(sizer_top_button, 0, wx.EXPAND, 5)  # Добавляем сайзер TOP в главный сайзер MAIN
 
         # Сайзер - DATA (основное размещение данных из бд)
@@ -92,7 +99,7 @@ class FrameMain(wx.Frame):
         sizerMain.Add(sizer_bottom, 0, wx.EXPAND, 5)  # Добавляем в сайзер MAIN сайзер BOTTOM
 
         self.SetSizer(sizerMain)  # Задаём основной сайзер для приложения
-        self.Layout()
+        self.Layout() # Перестраиваем интерфейс
         sizerMain.Fit(self)
 
         # Статус бар (нижняя часть окна)
@@ -102,7 +109,8 @@ class FrameMain(wx.Frame):
 
         # Подключение обработчиков
         self.add_button_data.Bind(wx.EVT_LEFT_DOWN, self.add_data_button_click)
-        self.show_button.Bind(wx.EVT_LEFT_DOWN, self.search)
+        self.del_button_data.Bind(wx.EVT_LEFT_DOWN, self.del_data_button_click)
+        self.search_button.Bind(wx.EVT_LEFT_DOWN, self.search)
         self.close_button.Bind(wx.EVT_LEFT_DOWN, self.close_program)
 
     # ---------------- Обработчики события---------------
@@ -112,7 +120,12 @@ class FrameMain(wx.Frame):
         dialog.ShowModal()
         dialog.Destroy()
 
-    # Обработчик события для кнопки "Поиск"
+    def del_data_button_click(self, event):
+        """Открытие окна Удалить данные"""
+        dialog = DelCmdOrMod(self)
+        dialog.ShowModal()
+        dialog.Destroy()
+
     def search(self, event):
         """Открытие диалога поиска"""
         dialog = SearchDialog(self)

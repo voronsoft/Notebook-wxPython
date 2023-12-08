@@ -41,10 +41,9 @@ class AddCommandOrModule(wx.Dialog):
         self.sizer_radio_button.Add(self.static_text_empty1, 0, wx.ALL, 5)
 
         # КНОПКА - Изменить КОМАНДУ
-        self.radio_edit_command = wx.RadioButton(self, wx.ID_ANY, u"Изменить КОМАНДУ", wx.DefaultPosition, wx.DefaultSize, 0)
+        self.radio_edit_command = wx.RadioButton(self, wx.ID_ANY, "Изменить КОМАНДУ", wx.DefaultPosition, wx.DefaultSize, 0)
         self.radio_edit_command.SetFont(wx.Font(10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
         self.sizer_radio_button.Add(self.radio_edit_command, 0, wx.ALL | wx.EXPAND, 5)
-        # self.radio_edit_command.SetValue(True)
 
         # Привязываем обработчик on_radio_change к событию изменения радио кнопок
         self.radio_add_command.Bind(wx.EVT_RADIOBUTTON, self.on_radio_change)
@@ -63,7 +62,6 @@ class AddCommandOrModule(wx.Dialog):
         # или добавить новый модуль
         self.sizer_DYNAMIC = wx.BoxSizer(wx.VERTICAL)
         self.sizer_main_dialog.Add(self.sizer_DYNAMIC, 1, wx.EXPAND, 5)
-
         # --------------------------------- END ----------------------------
 
         # Сайзер кнопок OK/CANCEL
@@ -78,7 +76,6 @@ class AddCommandOrModule(wx.Dialog):
         self.SetSizer(self.sizer_main_dialog)
         self.Layout()
         self.sizer_main_dialog.Fit(self)
-
         self.Centre(wx.BOTH)
 
     # Обработчик поведения на выбор активной радиокнопки
