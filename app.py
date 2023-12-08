@@ -116,21 +116,25 @@ class FrameMain(wx.Frame):
     # ---------------- Обработчики события---------------
     def add_data_button_click(self, event):
         """Открытие диалога добавить данные о команде или модуле"""
-        dialog = AddCommandOrModule(self)
-        dialog.ShowModal()
-        dialog.Destroy()
+        add_dialog = AddCommandOrModule(self)
+
+        # add_dialog.radio_edit_command.Enable(False)  # Отключаем радиокнопку - Изменить КОМАНДУ
+        add_dialog.radio_edit_command.Hide()  # Скрываем радиокнопку - Изменить КОМАНДУ
+
+        add_dialog.ShowModal()
+        add_dialog.Destroy()
 
     def del_data_button_click(self, event):
         """Открытие окна Удалить данные"""
-        dialog = DelCmdOrMod(self)
-        dialog.ShowModal()
-        dialog.Destroy()
+        del_dialog = DelCmdOrMod(self)
+        del_dialog.ShowModal()
+        del_dialog.Destroy()
 
     def search(self, event):
         """Открытие диалога поиска"""
-        dialog = SearchDialog(self)
-        dialog.ShowModal()
-        dialog.Destroy()
+        search_dialog = SearchDialog(self)
+        search_dialog.ShowModal()
+        search_dialog.Destroy()
 
     # ----------------  Обработчики событий для пунктов системного меню ----------------
     def show_documentation(self, event):

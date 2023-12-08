@@ -328,9 +328,9 @@ class PanelCenter(wx.Panel):
         edit_dialog = AddCommandOrModule(parent=self)  # Создаем экземпляр класса
         # делаем активной радиокнопку Изменить КОМАНДУ
         edit_dialog.radio_edit_command.SetValue(True)
-        # Отключаем активность кнопок
-        edit_dialog.radio_add_command.Enable(False)
-        edit_dialog.radio_add_module.Enable(False)
+        # Скрываем радио-кнопки (добавить команду/модуль)
+        edit_dialog.radio_add_command.Hide()
+        edit_dialog.radio_add_module.Hide()
         # Явно вызываем обработчик, чтобы загрузить соответствующую панель в динамический сайзер
         edit_dialog.on_radio_change(None)
 
