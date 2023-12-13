@@ -31,7 +31,7 @@ class FrameMain(wx.Frame):
     """
 
     def __init__(self, parent):
-        wx.Frame.__init__(self, parent, id=wx.ID_ANY, title="Блокнот команд", pos=wx.Point(0, 0), size=wx.Size(-1, -1),
+        wx.Frame.__init__(self, parent, id=wx.ID_ANY, title="Блокнот команд", pos=wx.Point(1, 1), size=wx.Size(-1, -1),
                           style=wx.DEFAULT_FRAME_STYLE | wx.MAXIMIZE_BOX | wx.TAB_TRAVERSAL)
         # Устанавливаем пропорциональность окна в зависимости от разности разрешений мониторов
         # Это гарантирует что окно при запуске программы не будет больше самого разрешения монитора
@@ -99,7 +99,7 @@ class FrameMain(wx.Frame):
         sizerMain.Add(sizer_bottom, 0, wx.EXPAND, 5)  # Добавляем в сайзер MAIN сайзер BOTTOM
 
         self.SetSizer(sizerMain)  # Задаём основной сайзер для приложения
-        self.Layout() # Перестраиваем интерфейс
+        self.Layout()  # Перестраиваем интерфейс
         sizerMain.Fit(self)
 
         # Статус бар (нижняя часть окна)
@@ -108,6 +108,7 @@ class FrameMain(wx.Frame):
         self.Maximize()  # Максимизируем окно на весь экран
 
         # Подключение обработчиков
+        # self.commands_choice.Bind(wx.EVT_CHOICE, self.on_command_select)
         self.add_button_data.Bind(wx.EVT_LEFT_DOWN, self.add_data_button_click)
         self.del_button_data.Bind(wx.EVT_LEFT_DOWN, self.del_data_button_click)
         self.search_button.Bind(wx.EVT_LEFT_DOWN, self.search)
@@ -126,6 +127,7 @@ class FrameMain(wx.Frame):
 
     def del_data_button_click(self, event):
         """Открытие окна Удалить данные"""
+        print('Включен диалог - "Удалить данные"')
         del_dialog = DelCmdOrMod(self)
         del_dialog.ShowModal()
         del_dialog.Destroy()

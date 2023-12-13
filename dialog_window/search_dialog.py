@@ -1,7 +1,7 @@
 import wx
 import wx.xrc
 import wx.richtext
-from utils.database_queries import request_to_get_all_modules, request_to_get_all_commands
+from utils.database_queries import request_to_get_all_modules, request_get_commands
 
 
 ###########################################################################
@@ -9,17 +9,19 @@ from utils.database_queries import request_to_get_all_modules, request_to_get_al
 ###########################################################################
 
 class SearchDialog(wx.Dialog):
+    """Поиск"""
 
     def __init__(self, parent):
-        wx.Dialog.__init__(self, parent, id=wx.ID_ANY, title="Поиск", pos=wx.DefaultPosition, size=wx.Size(-1, -1), style=wx.DEFAULT_DIALOG_STYLE)
+        wx.Dialog.__init__(self, parent, id=wx.ID_ANY, title="Поиск", pos=wx.DefaultPosition, size=wx.Size(600, 600), style=wx.DEFAULT_DIALOG_STYLE)
 
         self.SetSizeHints(wx.DefaultSize, wx.DefaultSize)
+        self.SetFont(wx.Font(10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
 
-        # Сайзер основного окна
+        # Главный сайзер окна
         sizer_main = wx.BoxSizer(wx.VERTICAL)
         sizer_main.SetMinSize(wx.Size(600, 600))
 
-        #  Сайзер TOP
+        # Сайзер TOP
         sizer_top = wx.BoxSizer(wx.HORIZONTAL)
         # Поле поиска
         # TODO доделать поиск по совпадению части слова
@@ -59,18 +61,16 @@ class SearchDialog(wx.Dialog):
 
         self.modules_choice.SetSelection(0)
         self.modules_choice.SetFont(wx.Font(10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
-        self.modules_choice.SetMinSize(wx.Size(200, -1))
         sizer_choice.Add(self.modules_choice, 1, wx.ALL | wx.EXPAND, 5)
         sizer_main.Add(sizer_choice, 0, wx.ALL | wx.EXPAND, 5)
 
-        commands_choiceChoices = [item['commands_name'] for item in request_to_get_all_commands(modules_choiceChoices[0])]
+        commands_choiceChoices = [item['commands_name'] for item in request_get_commands(modules_choiceChoices[0])]
         self.commands_choice = wx.Choice(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, commands_choiceChoices, 0 | wx.BORDER_SIMPLE)
         # Привязываем обработчик события к выбору команды
         self.commands_choice.Bind(wx.EVT_CHOICE, self.on_command_select)
 
         self.commands_choice.SetSelection(0)
         self.commands_choice.SetFont(wx.Font(10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
-        self.commands_choice.SetMinSize(wx.Size(200, -1))
         sizer_choice.Add(self.commands_choice, 1, wx.ALL | wx.EXPAND, 5)
 
         # Сайзер вывода основных данных
@@ -93,6 +93,7 @@ class SearchDialog(wx.Dialog):
 
         self.SetSizer(sizer_main)
         sizer_main.Fit(self)
+        self.Layout()
         self.Centre(wx.BOTH)
 
     # Обработчики
@@ -107,7 +108,7 @@ class SearchDialog(wx.Dialog):
     def on_module_select(self, event):
         """Обработчик события выбора модуля"""
         selected_module = self.modules_choice.GetStringSelection()  # Получаем выбранный модуль
-        commands = request_to_get_all_commands(selected_module)  # Запрашиваем команды для выбранного модуля
+        commands = request_get_commands(selected_module)  # Запрашиваем команды для выбранного модуля
         # Обновляем список команд в self.commands_choice
         self.commands_choice.SetItems([command['commands_name'] for command in commands])
         self.commands_choice.SetSelection(0)  # Выбираем первую команду по умолчанию
@@ -117,7 +118,7 @@ class SearchDialog(wx.Dialog):
         """Обработчик события выбора команды"""
         selected_module = self.modules_choice.GetStringSelection()  # Получаем выбранный модуль
         selected_command = self.commands_choice.GetStringSelection()  # Получаем выбранную команду
-        commands = request_to_get_all_commands(selected_module)  # Запрашиваем команды для выбранного модуля
+        commands = request_get_commands(selected_module)  # Запрашиваем команды для выбранного модуля
         command_info = [command for command in commands if command['commands_name'] == selected_command]
         if command_info:
             description_text = (f"Описание команды:\n{command_info[0]['description_command']}\n\n"

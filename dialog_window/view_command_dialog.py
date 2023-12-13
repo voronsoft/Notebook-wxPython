@@ -11,12 +11,9 @@ class ViewCommandData(wx.Dialog):
 
     def __init__(self, parent):
         wx.Dialog.__init__(self, parent, id=wx.ID_ANY, title='Данные о команде', pos=wx.DefaultPosition, size=wx.Size(600, 600), style=wx.DEFAULT_DIALOG_STYLE | wx.MAXIMIZE_BOX | wx.MINIMIZE_BOX)
-        # Задаем параметры шрифта
-        font = wx.Font(12, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
-        self.SetFont(font)
 
         self.SetSizeHints(wx.DefaultSize, wx.DefaultSize)
-
+        # Главный сайзер окна
         sizer_main = wx.BoxSizer(wx.VERTICAL)
 
         sizer_top = wx.BoxSizer(wx.HORIZONTAL)
@@ -26,7 +23,6 @@ class ViewCommandData(wx.Dialog):
         self.command_label.Wrap(-1)
         bSizer2_a.Add(self.command_label, 0, wx.ALL, 5)
         self.command_db_label = wx.StaticText(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0)
-        self.command_db_label.SetFont(wx.Font(12, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
         self.command_db_label.SetForegroundColour(wx.Colour(255, 0, 0))  # RGB цвет для красного
         self.command_db_label.Wrap(-1)
 
@@ -37,7 +33,6 @@ class ViewCommandData(wx.Dialog):
         self.modul_label.Wrap(-1)
         bSizer2_b.Add(self.modul_label, 0, wx.ALL, 5)
         self.modul_db_label = wx.StaticText(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0)
-        self.modul_db_label.SetFont(wx.Font(12, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
         self.modul_db_label.SetForegroundColour(wx.Colour(255, 0, 0))  # RGB цвет красный
         self.modul_db_label.Wrap(-1)
 
@@ -49,14 +44,12 @@ class ViewCommandData(wx.Dialog):
         bSizer3_a = wx.BoxSizer(wx.HORIZONTAL)
         bSizer3_a.SetMinSize(wx.Size(100, -1))  # Устанавливаем ширину
         self.description_label = wx.StaticText(self, wx.ID_ANY, "Описание:", wx.DefaultPosition, wx.DefaultSize, 0)
-        wx.Font.SetWeight(font, wx.FONTWEIGHT_NORMAL)
         self.description_label.Wrap(-1)
         bSizer3_a.Add(self.description_label, 0, wx.ALL, 5)
         bSizer3.Add(bSizer3_a, 0, wx.EXPAND, 5)
         bSizer3_b = wx.BoxSizer(wx.VERTICAL)
         self.description_text = wx.richtext.RichTextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition,
                                                          wx.DefaultSize, 0 | wx.BORDER_THEME | wx.HSCROLL | wx.VSCROLL | wx.WANTS_CHARS)
-        self.description_text.SetFont(wx.Font(12, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
         self.description_text.SetEditable(False)  # Делаем текст только для чтения
 
         bSizer3_b.Add(self.description_text, 1, wx.EXPAND | wx.ALL, 5)
@@ -73,7 +66,6 @@ class ViewCommandData(wx.Dialog):
         bSizer4_b = wx.BoxSizer(wx.VERTICAL)
         self.example_text = wx.richtext.RichTextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition,
                                                      wx.DefaultSize, 0 | wx.BORDER_THEME | wx.HSCROLL | wx.VSCROLL | wx.WANTS_CHARS)
-        self.example_text.SetFont(wx.Font(12, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
         self.example_text.SetEditable(False)  # Делаем текст только для чтения
 
         bSizer4_b.Add(self.example_text, 1, wx.EXPAND | wx.ALL, 5)
@@ -83,10 +75,3 @@ class ViewCommandData(wx.Dialog):
         self.SetSizer(sizer_main)
         self.Layout()
         self.Centre(wx.BOTH)
-
-
-if __name__ == '__main__':
-    app = wx.App(False)
-    frame = ViewCommandData(None)
-    frame.Show(True)
-    app.MainLoop()
