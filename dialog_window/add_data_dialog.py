@@ -52,15 +52,6 @@ class AddCommandOrModule(wx.Dialog):
         self.sizer_main_dialog.Add(self.sizer_DYNAMIC, 1, wx.EXPAND, 5)
         # --------------------------------- END ----------------------------
 
-        # Сайзер кнопок OK/CANCEL
-        self.sizer_bottom = wx.StdDialogButtonSizer()
-        self.sizer_bottomOK = wx.Button(self, wx.ID_OK)
-        self.sizer_bottom.AddButton(self.sizer_bottomOK)
-        self.sizer_bottomCancel = wx.Button(self, wx.ID_CANCEL)
-        self.sizer_bottom.AddButton(self.sizer_bottomCancel)
-        self.sizer_bottom.Realize()
-        self.sizer_main_dialog.Add(self.sizer_bottom, 0, wx.ALL | wx.EXPAND, 5)
-
         # Искусственно генерируем событие выбора активной радио-кнопки
         self.on_radio_change(event=self.radio_add_command)
         # Привязываем обработчик on_radio_change к событию изменения радио кнопок
@@ -157,6 +148,12 @@ class PanelAddCommand(wx.Panel):
 
         sizer_main_panel_cmd.Add(sizer_data_descr, 1, wx.EXPAND, 5)
 
+        # Сайзер кнопок
+        sizer_bottom = wx.BoxSizer(wx.VERTICAL)
+        self.button_apply = wx.Button(self, wx.ID_ANY, "Применить", wx.DefaultPosition, wx.DefaultSize, 0)
+        sizer_bottom.Add(self.button_apply, 0, wx.ALIGN_RIGHT | wx.ALL, 5)
+        sizer_main_panel_cmd.Add(sizer_bottom, 0, wx.EXPAND, 5)
+
         self.SetSizer(sizer_main_panel_cmd)
         self.Layout()
         sizer_main_panel_cmd.Fit(self)
@@ -197,6 +194,12 @@ class PanelAddModule(wx.Panel):
         self.mod_description_data = wx.richtext.RichTextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 | wx.BORDER_SIMPLE | wx.HSCROLL | wx.VSCROLL | wx.WANTS_CHARS)
         sizer_data_descr.Add(self.mod_description_data, 1, wx.EXPAND | wx.ALL, 5)
         sizer_main_panel_mod.Add(sizer_data_descr, 1, wx.EXPAND, 5)
+
+        # Сайзер кнопок
+        sizer_bottom = wx.BoxSizer(wx.VERTICAL)
+        self.button_apply = wx.Button(self, wx.ID_ANY, "Применить", wx.DefaultPosition, wx.DefaultSize, 0)
+        sizer_bottom.Add(self.button_apply, 0, wx.ALIGN_RIGHT | wx.ALL, 5)
+        sizer_main_panel_mod.Add(sizer_bottom, 0, wx.EXPAND, 5)
 
         self.SetSizer(sizer_main_panel_mod)
         self.Layout()
@@ -255,6 +258,12 @@ class PanelEditCommand(wx.Panel):
         sizer_data.Add(self.example_data, 1, wx.EXPAND | wx.ALL, 5)
 
         sizer_main.Add(sizer_data, 1, wx.ALL | wx.EXPAND, 5)
+
+        # Сайзер кнопок
+        sizer_bottom = wx.BoxSizer(wx.VERTICAL)
+        self.button_apply = wx.Button(self, wx.ID_ANY, "Применить", wx.DefaultPosition, wx.DefaultSize, 0)
+        sizer_bottom.Add(self.button_apply, 0, wx.ALIGN_RIGHT | wx.ALL, 5)
+        sizer_main.Add(sizer_bottom, 0, wx.EXPAND, 5)
 
         self.SetSizer(sizer_main)
         self.Layout()

@@ -51,15 +51,6 @@ class DelCmdOrMod(wx.Dialog):
         # ================ END Заглушка =================
         self.sizer_main_dialog.Add(self.sizer_DYNAMIC_del, 1, wx.EXPAND, 5)
 
-        # Сайзер кнопок OK/CANCEL
-        self.sizer_bottom = wx.StdDialogButtonSizer()
-        self.sizer_bottomOK = wx.Button(self, wx.ID_OK)
-        self.sizer_bottom.AddButton(self.sizer_bottomOK)
-        self.sizer_bottomCancel = wx.Button(self, wx.ID_CANCEL)
-        self.sizer_bottom.AddButton(self.sizer_bottomCancel)
-        self.sizer_bottom.Realize()
-        self.sizer_main_dialog.Add(self.sizer_bottom, 0, wx.ALL | wx.EXPAND, 5)
-
         # Искусственно генерируем событие выбора активной радио-кнопки
         self.on_radio_change(event=self.radio_del_module)
         # Привязываем событие для выбора активной радиокнопки обработчик - on_radio_change
@@ -83,13 +74,11 @@ class DelCmdOrMod(wx.Dialog):
             print('В диалоге "Удалить данные" активна радио-кнопка - "Удалить МОДУЛЬ"')
             del_mod_connect = PanelDelModule(self)  # Создаем экземпляр класса
             self.sizer_DYNAMIC_del.Add(del_mod_connect, 1, wx.EXPAND | wx.ALL, 5)
-            # Отображаем сайзер нижних кнопок
-            self.sizer_bottom.ShowItems(True)
+
             self.sizer_DYNAMIC_del.Layout()
         elif self.radio_del_command.GetValue():  # Есл активна радио-кнопка - "Удалить КОМАНДУ"
             print('В диалоге "Удалить данные" активна радио-кнопка - "Удалить КОМАНДУ"')
             del_cmd_connect = PanelDelCommand(self)  # Экземпляр класса PanelDelCommand
-            self.sizer_bottom.ShowItems(False)  # Скрываем сайзер нижних кнопок
             self.sizer_DYNAMIC_del.Add(del_cmd_connect, 1, wx.EXPAND | wx.ALL, 5)
             self.sizer_DYNAMIC_del.Fit(self)
 
@@ -134,17 +123,21 @@ class PanelDelModule(wx.Panel):
 
         # Сайзер данных
         sizer_data = wx.BoxSizer(wx.VERTICAL)
-
         self.info_cmd_label = wx.StaticText(self, wx.ID_ANY, "Связанные команды с модулем будут автоматически удалены:", wx.DefaultPosition, wx.DefaultSize, 0)
         self.info_cmd_label.Wrap(-1)
         sizer_data.Add(self.info_cmd_label, 0, wx.ALL, 5)
-
         # Скроллинг для окна
         self.scrolled_window = wx.ScrolledWindow(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.HSCROLL | wx.VSCROLL)
         self.scrolled_window.SetScrollRate(15, 15)
-
         sizer_data.Add(self.scrolled_window, 1, wx.EXPAND | wx.ALL, 5)
+        
         sizer_main_panel_del_mod.Add(sizer_data, 1, wx.EXPAND, 5)
+
+        # Сайзер кнопок
+        sizer_bottom = wx.BoxSizer(wx.VERTICAL)
+        self.button_apply = wx.Button(self, wx.ID_ANY, "Применить", wx.DefaultPosition, wx.DefaultSize, 0)
+        sizer_bottom.Add(self.button_apply, 0, wx.ALIGN_RIGHT | wx.ALL, 5)
+        sizer_main_panel_del_mod.Add(sizer_bottom, 0, wx.EXPAND, 5)
 
         self.SetSizer(sizer_main_panel_del_mod)
         sizer_main_panel_del_mod.Fit(self)
