@@ -5,6 +5,7 @@ from dialog_window.del_data_dialog import DelCmdOrMod
 from dialog_window.panel_center_dialog import PanelCenter
 from dialog_window.about_program_dialog import AboutProgram
 from dialog_window.add_data_dialog import AddCommandOrModule
+from dialog_window.edit_data_dialig import EditCommandOrModule
 
 
 ###########################################################################
@@ -69,13 +70,18 @@ class FrameMain(wx.Frame):
         sizer_top_button = wx.BoxSizer(wx.HORIZONTAL)
         sizer_top_button.SetMinSize(wx.Size(600, 50))
 
-        self.add_button_data = wx.Button(self, wx.ID_ANY, "Добавить данные", wx.DefaultPosition, wx.DefaultSize, 0)
-        self.add_button_data.SetLabelMarkup("Добавить данные")
+        self.add_button_data = wx.Button(self, wx.ID_ANY, "Добавить", wx.DefaultPosition, wx.DefaultSize, 0)
+        self.add_button_data.SetLabelMarkup("Добавить")
         self.add_button_data.SetFont(wx.Font(14, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
         sizer_top_button.Add(self.add_button_data, 1, wx.ALL | wx.EXPAND, 5)
 
-        self.del_button_data = wx.Button(self, wx.ID_ANY, "Удалить данные", wx.DefaultPosition, wx.DefaultSize, 0)
-        self.del_button_data.SetLabelMarkup("Удалить данные")
+        self.edit_button_data = wx.Button(self, wx.ID_ANY, "Изменить", wx.DefaultPosition, wx.DefaultSize, 0)
+        self.edit_button_data.SetLabelMarkup("Изменить")
+        self.edit_button_data.SetFont(wx.Font(14, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
+        sizer_top_button.Add(self.edit_button_data, 1, wx.ALL | wx.EXPAND, 5)
+
+        self.del_button_data = wx.Button(self, wx.ID_ANY, "Удалить", wx.DefaultPosition, wx.DefaultSize, 0)
+        self.del_button_data.SetLabelMarkup("Удалить")
         self.del_button_data.SetFont(wx.Font(14, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
         sizer_top_button.Add(self.del_button_data, 1, wx.ALL | wx.EXPAND, 5)
 
@@ -108,8 +114,8 @@ class FrameMain(wx.Frame):
         self.Maximize()  # Максимизируем окно на весь экран
 
         # Подключение обработчиков
-        # self.commands_choice.Bind(wx.EVT_CHOICE, self.on_command_select)
         self.add_button_data.Bind(wx.EVT_LEFT_DOWN, self.add_data_button_click)
+        self.edit_button_data.Bind(wx.EVT_LEFT_DOWN, self.edit_data_button_click)
         self.del_button_data.Bind(wx.EVT_LEFT_DOWN, self.del_data_button_click)
         self.search_button.Bind(wx.EVT_LEFT_DOWN, self.search)
         self.close_button.Bind(wx.EVT_LEFT_DOWN, self.close_program)
@@ -118,10 +124,13 @@ class FrameMain(wx.Frame):
     def add_data_button_click(self, event):
         """Открытие диалога добавить данные о команде или модуле"""
         add_dialog = AddCommandOrModule(self)
-
-        # add_dialog.radio_edit_command.Enable(False)  # Отключаем радиокнопку - Изменить КОМАНДУ
         add_dialog.radio_edit_command.Hide()  # Скрываем радиокнопку - Изменить КОМАНДУ
+        add_dialog.ShowModal()
+        add_dialog.Destroy()
 
+    def edit_data_button_click(self, event):
+        """Открытие диалога изменить данные о команде или модуле"""
+        add_dialog = EditCommandOrModule(self)
         add_dialog.ShowModal()
         add_dialog.Destroy()
 

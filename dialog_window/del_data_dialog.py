@@ -1,14 +1,13 @@
 import wx
 import wx.xrc
-from dialog_window import panel_center_dialog
 from utils import database_queries
+from dialog_window import panel_center_dialog
 from utils.database_queries import request_to_get_all_modules, request_get_commands, del_command
 
 
 ###########################################################################
 # Class DelCmdOrMod
 ###########################################################################
-
 class DelCmdOrMod(wx.Dialog):
     """Главное окно удалить: Команду или Модуль"""
 
@@ -49,8 +48,8 @@ class DelCmdOrMod(wx.Dialog):
         # или удалить команду - Class PanelDelCommand
         self.sizer_DYNAMIC_del = wx.BoxSizer(wx.VERTICAL)
         # ================== Заглушка ===================
+        # ================ END Заглушка =================
         self.sizer_main_dialog.Add(self.sizer_DYNAMIC_del, 1, wx.EXPAND, 5)
-        # ------------------------------------------ END ----------------------------------
 
         # Сайзер кнопок OK/CANCEL
         self.sizer_bottom = wx.StdDialogButtonSizer()
@@ -61,10 +60,12 @@ class DelCmdOrMod(wx.Dialog):
         self.sizer_bottom.Realize()
         self.sizer_main_dialog.Add(self.sizer_bottom, 0, wx.ALL | wx.EXPAND, 5)
 
+        # Искусственно генерируем событие выбора активной радио-кнопки
+        self.on_radio_change(event=self.radio_del_module)
         # Привязываем событие для выбора активной радиокнопки обработчик - on_radio_change
         self.radio_del_module.Bind(wx.EVT_RADIOBUTTON, self.on_radio_change)
         self.radio_del_command.Bind(wx.EVT_RADIOBUTTON, self.on_radio_change)
-        # Привязываем событие закрытия окна к обработчику
+        # Привязываем событие при закрытии окна
         self.Bind(wx.EVT_CLOSE, self.on_close_dialog)
 
         self.SetSizer(self.sizer_main_dialog)
@@ -105,7 +106,6 @@ class DelCmdOrMod(wx.Dialog):
 ###########################################################################
 # Class PanelDelModule
 ###########################################################################
-
 class PanelDelModule(wx.Panel):
     """Удалить Модуль"""
 
@@ -119,7 +119,7 @@ class PanelDelModule(wx.Panel):
         sizer_top_inf = wx.BoxSizer(wx.VERTICAL)
 
         # Текстовое поле
-        self.info_mod_label = wx.StaticText(self, wx.ID_ANY, "Удалить модуль (выберите из списка):", wx.DefaultPosition, wx.Size(-1, -1), wx.ALIGN_CENTER_HORIZONTAL | wx.BORDER_SIMPLE)
+        self.info_mod_label = wx.StaticText(self, wx.ID_ANY, "Удалить модуль (выберите из списка):", wx.DefaultPosition, wx.Size(-1, -1), wx.ALIGN_CENTER_HORIZONTAL)
         self.info_mod_label.Wrap(-1)
         sizer_top_inf.Add(self.info_mod_label, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5)
 
@@ -161,7 +161,6 @@ class PanelDelModule(wx.Panel):
         sizer_cmd_list = wx.BoxSizer(wx.VERTICAL)
 
         if self.scrolled_window.GetSizer():
-
             # Удаляем старый сайзер
             self.scrolled_window.DestroyChildren()
 
@@ -276,10 +275,3 @@ class PanelDelCommand(wx.Panel):
         tab.scrol_wind.Layout()
         tab.Layout()
         # TODO после удаления команды нужно обновить данные на главной странице (удаленные команды остаются в списке)
-
-
-if __name__ == "__main__":
-    app = wx.App(False)
-    frame = DelCmdOrMod(None)
-    frame.Show(True)
-    app.MainLoop()

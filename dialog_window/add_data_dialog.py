@@ -6,7 +6,6 @@ import wx.richtext
 ###########################################################################
 #  Class AddCommandOrModule
 ###########################################################################
-
 class AddCommandOrModule(wx.Dialog):
     """Главное окно добавить: Команду или Модуль"""
 
@@ -17,38 +16,27 @@ class AddCommandOrModule(wx.Dialog):
         self.SetFont(wx.Font(10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
         # Главный сайзер окна
         self.sizer_main_dialog = wx.BoxSizer(wx.VERTICAL)
-
         self.sizer_main_dialog.SetMinSize(wx.Size(600, 600))
-        self.sizer_radio_button = wx.BoxSizer(wx.HORIZONTAL)
 
+        # Сайзер радио-кнопок
+        self.sizer_radio_button = wx.BoxSizer(wx.HORIZONTAL)
         # КНОПКА - Добавить КОМАНДУ
         self.radio_add_command = wx.RadioButton(self, wx.ID_ANY, "Добавить КОМАНДУ", wx.DefaultPosition, wx.DefaultSize, 0)
         self.sizer_radio_button.Add(self.radio_add_command, 0, wx.ALL | wx.EXPAND, 5)
-
-        # сайзер заполнитель
+        # Заполнитель
         self.static_text_empty = wx.StaticText(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size(50, -1), 0)
-        self.static_text_empty.Wrap(-1)
         self.sizer_radio_button.Add(self.static_text_empty, 0, wx.ALL, 5)
-
         # КНОПКА - Добавить МОДУЛЬ
         self.radio_add_module = wx.RadioButton(self, wx.ID_ANY, "Добавить МОДУЛЬ", wx.DefaultPosition, wx.DefaultSize, 0)
         self.sizer_radio_button.Add(self.radio_add_module, 0, wx.ALL | wx.EXPAND, 5)
         self.sizer_main_dialog.Add(self.sizer_radio_button, 0, wx.ALIGN_CENTER_HORIZONTAL | wx.ALL, 5)
-
-        # сайзер заполнитель
+        # Заполнитель
         self.static_text_empty1 = wx.StaticText(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size(50, -1), 0)
-        self.static_text_empty1.Wrap(-1)
         self.sizer_radio_button.Add(self.static_text_empty1, 0, wx.ALL, 5)
-
         # КНОПКА - Изменить КОМАНДУ
         self.radio_edit_command = wx.RadioButton(self, wx.ID_ANY, "Изменить КОМАНДУ", wx.DefaultPosition, wx.DefaultSize, 0)
         self.radio_edit_command.SetFont(wx.Font(10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
         self.sizer_radio_button.Add(self.radio_edit_command, 0, wx.ALL | wx.EXPAND, 5)
-
-        # Привязываем обработчик on_radio_change к событию изменения радио кнопок
-        self.radio_add_command.Bind(wx.EVT_RADIOBUTTON, self.on_radio_change)
-        self.radio_add_module.Bind(wx.EVT_RADIOBUTTON, self.on_radio_change)
-        self.radio_edit_command.Bind(wx.EVT_RADIOBUTTON, self.on_radio_change)
 
         # Сайзер - Разделительной линии
         self.sizer_line = wx.BoxSizer(wx.VERTICAL)
@@ -72,6 +60,15 @@ class AddCommandOrModule(wx.Dialog):
         self.sizer_bottom.AddButton(self.sizer_bottomCancel)
         self.sizer_bottom.Realize()
         self.sizer_main_dialog.Add(self.sizer_bottom, 0, wx.ALL | wx.EXPAND, 5)
+
+        # Искусственно генерируем событие выбора активной радио-кнопки
+        self.on_radio_change(event=self.radio_add_command)
+        # Привязываем обработчик on_radio_change к событию изменения радио кнопок
+        self.radio_add_command.Bind(wx.EVT_RADIOBUTTON, self.on_radio_change)
+        self.radio_add_module.Bind(wx.EVT_RADIOBUTTON, self.on_radio_change)
+        self.radio_edit_command.Bind(wx.EVT_RADIOBUTTON, self.on_radio_change)
+        # Привязываем событие при закрытии окна
+        self.Bind(wx.EVT_CLOSE, self.on_close_dialog)
 
         self.SetSizer(self.sizer_main_dialog)
         self.Layout()
@@ -100,11 +97,15 @@ class AddCommandOrModule(wx.Dialog):
         self.Layout()
         self.sizer_DYNAMIC.Fit(self)
 
+    # Обработчик события закрытия окна
+    def on_close_dialog(self, event):
+        """Закрытие диалогового окна"""
+        self.Destroy()
+
 
 ###########################################################################
 # Class PanelAddCommand
 ###########################################################################
-
 class PanelAddCommand(wx.Panel):
     """Добавление данных о команде"""
 
@@ -164,7 +165,6 @@ class PanelAddCommand(wx.Panel):
 ###########################################################################
 # Class PanelAddModule
 ###########################################################################
-
 class PanelAddModule(wx.Panel):
     """Добавление данных о модуле"""
 
@@ -206,7 +206,6 @@ class PanelAddModule(wx.Panel):
 ###########################################################################
 # Class PanelEditCommand
 ###########################################################################
-
 class PanelEditCommand(wx.Panel):
     def __init__(self, parent, id=wx.ID_ANY, pos=wx.DefaultPosition, size=wx.Size(-1, -1), style=wx.TAB_TRAVERSAL, name=wx.EmptyString):
         wx.Panel.__init__(self, parent, id=id, pos=pos, size=size, style=style, name=name)
@@ -267,3 +266,10 @@ class PanelEditCommand(wx.Panel):
         self.mod_data_name.SetLabel(module)
         self.description_data.WriteText(description)
         self.example_data.WriteText(example)
+
+
+if __name__ == '__main__':
+    app = wx.App(False)
+    frame = AddCommandOrModule(None)
+    frame.Show(True)
+    app.MainLoop()
