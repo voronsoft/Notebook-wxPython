@@ -107,7 +107,6 @@ class PanelEditModule(wx.Panel):
         choice_modChoices = []
         self.choice_mod = wx.Choice(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, choice_modChoices, 0)
         self.choice_mod.SetSelection(0)
-        self.choice_mod.SetFont(wx.Font(10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False, "Arial"))
 
         sizer_data.Add(self.choice_mod, 0, wx.ALL | wx.EXPAND, 5)
 
@@ -145,76 +144,104 @@ class PanelEditModule(wx.Panel):
 # Class PanelEditCommand
 ###########################################################################
 class PanelEditCommand(wx.Panel):
-    """Изменить команду"""
 
     def __init__(self, parent, id=wx.ID_ANY, pos=wx.DefaultPosition, size=wx.Size(-1, -1), style=wx.TAB_TRAVERSAL, name=wx.EmptyString):
         wx.Panel.__init__(self, parent, id=id, pos=pos, size=size, style=style, name=name)
+
         # Главный сайзер
         sizer_main_panel_edit_cmd = wx.BoxSizer(wx.VERTICAL)
-
         sizer_main_panel_edit_cmd.SetMinSize(wx.Size(600, 600))
-        sizer_data = wx.BoxSizer(wx.VERTICAL)
 
+        # Сайзер для контекстного меню
+        sizer_ctx_edit_cmd = wx.GridSizer(0, 2, 0, 0)
+
+        self.command_name_label = wx.StaticText(self, wx.ID_ANY, "Команда:", wx.DefaultPosition, wx.Size(250, -1), wx.ALIGN_CENTER_HORIZONTAL)
+        self.command_name_label.Wrap(-1)
+        sizer_ctx_edit_cmd.Add(self.command_name_label, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5)
+
+        self.module_name_label = wx.StaticText(self, wx.ID_ANY, "Модуль:", wx.DefaultPosition, wx.Size(250, -1), wx.ALIGN_CENTER_HORIZONTAL)
+        self.module_name_label.Wrap(-1)
+        sizer_ctx_edit_cmd.Add(self.module_name_label, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5)
+
+        self.cmd_data_name = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size(250, -1), 0 | wx.BORDER_SIMPLE)
+        self.cmd_data_name.SetMaxSize(wx.Size(300, -1))
+        sizer_ctx_edit_cmd.Add(self.cmd_data_name, 0, wx.BOTTOM | wx.EXPAND | wx.LEFT | wx.RIGHT, 5)
+
+        self.mod_data_name = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size(250, -1), wx.TE_READONLY | wx.BORDER_SIMPLE)
+        self.mod_data_name.SetMaxSize(wx.Size(300, -1))
+        sizer_ctx_edit_cmd.Add(self.mod_data_name, 0, wx.BOTTOM | wx.EXPAND | wx.LEFT | wx.RIGHT, 5)
+
+        sizer_main_panel_edit_cmd.Add(sizer_ctx_edit_cmd, 0, wx.EXPAND, 5)
+
+        # Сайзер для выбора из списка команд
+        sizer_indiv_edit_cmd = wx.BoxSizer(wx.VERTICAL)
+        #
         self.choice_mod_label = wx.StaticText(self, wx.ID_ANY, "Выберите модуль:", wx.DefaultPosition, wx.DefaultSize, 0)
         self.choice_mod_label.Wrap(-1)
-
-        sizer_data.Add(self.choice_mod_label, 0, wx.TOP | wx.RIGHT | wx.LEFT, 5)
-
+        sizer_indiv_edit_cmd.Add(self.choice_mod_label, 0, wx.TOP | wx.RIGHT | wx.LEFT, 5)
+        # Поле выбора модуля
         choice_modChoices = []
         self.choice_mod = wx.Choice(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, choice_modChoices, 0)
-        self.choice_mod.SetSelection(0)
-        sizer_data.Add(self.choice_mod, 0, wx.ALL | wx.EXPAND, 5)
-
+        sizer_indiv_edit_cmd.Add(self.choice_mod, 0, wx.ALL | wx.EXPAND, 5)
+        #
         self.choice_cmd_label = wx.StaticText(self, wx.ID_ANY, "Выберите команду:", wx.DefaultPosition, wx.DefaultSize, 0)
-        self.choice_cmd_label.Wrap(-1)
-
-        sizer_data.Add(self.choice_cmd_label, 0, wx.TOP | wx.RIGHT | wx.LEFT, 5)
-
+        sizer_indiv_edit_cmd.Add(self.choice_cmd_label, 0, wx.TOP | wx.RIGHT | wx.LEFT, 5)
+        # Поле выбора команды
         choice_cmdChoices = []
         self.choice_cmd = wx.Choice(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, choice_cmdChoices, 0)
-        self.choice_cmd.SetSelection(0)
-        sizer_data.Add(self.choice_cmd, 0, wx.ALL | wx.EXPAND, 5)
+        self.choice_cmd.SetSelection(-1)
+        sizer_indiv_edit_cmd.Add(self.choice_cmd, 0, wx.ALL | wx.EXPAND, 5)
 
-        self.name_label = wx.StaticText(self, wx.ID_ANY, "Название:", wx.DefaultPosition, wx.DefaultSize, 0)
-        self.name_label.Wrap(-1)
+        sizer_main_panel_edit_cmd.Add(sizer_indiv_edit_cmd, 0, wx.EXPAND, 5)
 
-        sizer_data.Add(self.name_label, 0, wx.TOP | wx.RIGHT | wx.LEFT, 5)
-
-        self.name_inp_text = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0)
-        sizer_data.Add(self.name_inp_text, 0, wx.EXPAND | wx.BOTTOM | wx.RIGHT | wx.LEFT, 5)
-
+        # Сайзер данных: нов-назв команды/описание/пример
+        sizer_data = wx.BoxSizer(wx.VERTICAL)
+        #
+        self.new_name_label = wx.StaticText(self, wx.ID_ANY, "Новое название (если пусто используется старое):", wx.DefaultPosition, wx.DefaultSize, 0)
+        self.new_name_label.Wrap(-1)
+        sizer_data.Add(self.new_name_label, 0, wx.TOP | wx.RIGHT | wx.LEFT, 5)
+        # Поле ввода нового названия команды
+        self.new_name_inp_text = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0)
+        sizer_data.Add(self.new_name_inp_text, 0, wx.EXPAND | wx.BOTTOM | wx.RIGHT | wx.LEFT, 5)
+        #
         self.descr_label = wx.StaticText(self, wx.ID_ANY, "Описание:", wx.DefaultPosition, wx.DefaultSize, 0)
         self.descr_label.Wrap(-1)
-
         sizer_data.Add(self.descr_label, 0, wx.LEFT | wx.RIGHT | wx.TOP, 5)
-
-        self.descr_inp_text = wx.richtext.RichTextCtrl(self, wx.ID_ANY, "Описание модуля", wx.DefaultPosition, wx.Size(-1, 200), 0 | wx.HSCROLL | wx.VSCROLL | wx.WANTS_CHARS)
+        # Поле описания команды
+        self.descr_inp_text = wx.richtext.RichTextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size(-1, 200), 0 | wx.HSCROLL | wx.VSCROLL | wx.WANTS_CHARS)
+        self.descr_inp_text.SetFont(wx.Font(10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
         self.descr_inp_text.SetMinSize(wx.Size(-1, 200))
-
         sizer_data.Add(self.descr_inp_text, 2, wx.EXPAND | wx.BOTTOM | wx.RIGHT | wx.LEFT, 5)
-
+        #
         self.exampl_label = wx.StaticText(self, wx.ID_ANY, "Пример:", wx.DefaultPosition, wx.DefaultSize, 0)
         self.exampl_label.Wrap(-1)
-
         sizer_data.Add(self.exampl_label, 0, wx.EXPAND | wx.TOP | wx.RIGHT | wx.LEFT, 5)
-
-        self.exampl_inp_text = wx.richtext.RichTextCtrl(self, wx.ID_ANY, "Пример описания", wx.DefaultPosition, wx.Size(-1, 200), 0 | wx.VSCROLL | wx.HSCROLL | wx.NO_BORDER | wx.WANTS_CHARS)
+        # Поле пример
+        self.exampl_inp_text = wx.richtext.RichTextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size(-1, 200), 0 | wx.VSCROLL | wx.HSCROLL | wx.NO_BORDER | wx.WANTS_CHARS)
+        self.exampl_inp_text.SetFont(wx.Font(10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
         self.exampl_inp_text.SetMinSize(wx.Size(-1, 100))
-
         sizer_data.Add(self.exampl_inp_text, 1, wx.EXPAND | wx.BOTTOM | wx.RIGHT | wx.LEFT, 5)
 
         sizer_main_panel_edit_cmd.Add(sizer_data, 1, wx.EXPAND, 5)
 
+        # Сайзер кнопок
         sizer_bottom = wx.BoxSizer(wx.VERTICAL)
 
         self.button_apply = wx.Button(self, wx.ID_ANY, "Применить", wx.DefaultPosition, wx.DefaultSize, 0)
         sizer_bottom.Add(self.button_apply, 0, wx.ALIGN_RIGHT | wx.ALL, 5)
-
         sizer_main_panel_edit_cmd.Add(sizer_bottom, 0, wx.EXPAND, 5)
+        # Привязываем событие для кнопки - "Применить"
+        self.button_apply.Bind(wx.EVT_BUTTON, self.on_btn_apply)
 
         self.SetSizer(sizer_main_panel_edit_cmd)
         self.Layout()
         sizer_main_panel_edit_cmd.Fit(self)
+
+    # --------------Обработчики событий --------------
+    def on_btn_apply(self, event):
+        """"Изменение команды в БД"""
+        ...
+        # TODO доделать функцию изменения команды
 
 
 if __name__ == '__main__':
