@@ -32,7 +32,8 @@ class FrameMain(wx.Frame):
     """
 
     def __init__(self, parent):
-        wx.Frame.__init__(self, parent, id=wx.ID_ANY, title="Блокнот команд", pos=wx.Point(1, 1), size=wx.Size(-1, -1),
+        wx.Frame.__init__(self, parent, id=wx.ID_ANY, title="Блокнот команд",
+                          pos=wx.Point(1, 1), size=wx.Size(-1, -1),
                           style=wx.DEFAULT_FRAME_STYLE | wx.MAXIMIZE_BOX | wx.TAB_TRAVERSAL)
         # Устанавливаем пропорциональность окна в зависимости от разности разрешений мониторов
         # Это гарантирует что окно при запуске программы не будет больше самого разрешения монитора
@@ -91,11 +92,13 @@ class FrameMain(wx.Frame):
         sizer_top_button.Add(self.search_button, 1, wx.ALL | wx.EXPAND, 5)
         sizerMain.Add(sizer_top_button, 0, wx.EXPAND, 5)  # Добавляем сайзер TOP в главный сайзер MAIN
 
+        # -----------------------------------------------------------
         # Сайзер - DATA (основное размещение данных из бд)
         sizer_data = wx.BoxSizer(wx.VERTICAL)
         panel_center = PanelCenter(self)  # Экземпляр класса PanelCenter (данные из бд в основном сайзере DATA)
         sizer_data.Add(panel_center, 0, wx.EXPAND, 5)  # Добавляем в сайзер DATA экземпляр класса PanelCenter
         sizerMain.Add(sizer_data, 1, wx.EXPAND, 5)  # Добавляем в сайзер MAIN сайзер DATA
+        # -----------------------------------------------------------
 
         # Сайзер - BOTTOM
         sizer_bottom = wx.BoxSizer(wx.VERTICAL)
@@ -109,7 +112,7 @@ class FrameMain(wx.Frame):
         sizerMain.Fit(self)
 
         # Статус бар (нижняя часть окна)
-        self.statusBar1 = self.CreateStatusBar(1, wx.STB_SIZEGRIP, wx.ID_ANY)
+        self.statusBar = self.CreateStatusBar(1, wx.STB_SIZEGRIP, wx.ID_ANY)
 
         self.Maximize()  # Максимизируем окно на весь экран
 
@@ -119,6 +122,8 @@ class FrameMain(wx.Frame):
         self.del_button_data.Bind(wx.EVT_LEFT_DOWN, self.del_data_button_click)
         self.search_button.Bind(wx.EVT_LEFT_DOWN, self.search)
         self.close_button.Bind(wx.EVT_LEFT_DOWN, self.close_program)
+
+        self.update_main_window()
 
     # ---------------- Обработчики события---------------
     def add_data_button_click(self, event):
@@ -167,6 +172,26 @@ class FrameMain(wx.Frame):
         dialog = AddCommandOrModule(self)
         dialog.ShowModal()
         dialog.Destroy()
+
+    # ---------------- Функции ----------------
+    def update_main_window(self):
+        """Обновление сайзера sizer_data"""
+        # Получаем текущий сайзер sizer_data
+        sizer_data = self.GetSizer().GetItem(1).GetSizer()
+
+        # Уничтожаем все элементы в текущем сайзере
+        for item in sizer_data.GetChildren():
+            item.GetWindow().Destroy()
+
+        # Создаем новый экземпляр класса PanelCenter
+        new_panel_center = PanelCenter(self)
+
+        # Добавляем новый экземпляр в сайзер sizer_data
+        sizer_data.Add(new_panel_center, 0, wx.EXPAND, 5)
+
+        # Обновляем отображение
+        self.Layout()
+        self.Refresh()
 
 
 if __name__ == '__main__':

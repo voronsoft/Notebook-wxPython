@@ -12,6 +12,8 @@ class PanelCenter(wx.Panel):
 
     def __init__(self, parent, id=wx.ID_ANY, pos=wx.DefaultPosition, size=wx.Size(600, 600), style=wx.TAB_TRAVERSAL, name=wx.EmptyString):
         wx.Panel.__init__(self, parent, id=id, pos=pos, size=size, style=style, name=name)
+
+        # Главный сайзер диалога
         sizer_main_panel = wx.BoxSizer(wx.VERTICAL)
         self.notebook = wx.Notebook(self, wx.ID_ANY, wx.DefaultPosition, wx.Size(-1, -1), 0)
         sizer_main_panel.Add(self.notebook, 1, wx.EXPAND | wx.ALL, 5)
@@ -25,6 +27,7 @@ class PanelCenter(wx.Panel):
         # Список вкладок (модулей) панели notebook
         self.list_tabs_mod = [self.notebook.GetPage(i) for i in range(self.notebook.GetPageCount())]
 
+        # TODO если удалить все модули то приложение не запускается из за ошибки в строке 31
         # ######################################
         # Загружаем данные для первой вкладки при запуске главной страницы (что-бы страница не была пустой)
         if self.list_tabs_mod[0].scrol_wind.GetSizer().GetItemCount() == 0:
@@ -191,6 +194,10 @@ class PanelCenter(wx.Panel):
 
         edit_dialog.ShowModal()
         edit_dialog.Destroy()
+
+    # ----------- Функции ----------
+    def update_cmd(self):
+        """Обновление сайзера c перечнем команд"""
 
 
 ###########################################################################

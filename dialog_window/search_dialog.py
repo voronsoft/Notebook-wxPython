@@ -3,7 +3,7 @@ import wx.xrc
 import wx.richtext
 from utils.database_queries import request_to_get_all_modules, request_get_commands
 
-
+# TODO если удалить все модули с командами поиск не работает
 ###########################################################################
 # Class SearchDialog
 ###########################################################################

@@ -2,8 +2,10 @@ import wx
 import wx.xrc
 from utils import database_queries
 from dialog_window import panel_center_dialog
-from utils.database_queries import request_to_get_all_modules, request_get_commands, del_command
+from utils.database_queries import request_to_get_all_modules, request_get_commands, del_module, del_command
 
+
+# TODO после удаления команды нужно обновить данные на главной странице (удаленные команды остаются в списке)
 
 ###########################################################################
 # Class DelCmdOrMod
@@ -13,6 +15,8 @@ class DelCmdOrMod(wx.Dialog):
 
     def __init__(self, parent):
         wx.Dialog.__init__(self, parent, id=wx.ID_ANY, title="Удалить данные", pos=wx.DefaultPosition, size=wx.Size(600, 600), style=wx.DEFAULT_DIALOG_STYLE)
+
+        self.parent_dialog = parent  # Родитель окна
 
         self.SetSizeHints(wx.DefaultSize, wx.DefaultSize)
         self.SetFont(wx.Font(10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
@@ -89,7 +93,19 @@ class DelCmdOrMod(wx.Dialog):
     # Обработчик события закрытия окна
     def on_close_dialog(self, event):
         """Закрытие диалогового окна"""
+        # Отображаем диалоговое окно с сообщением
+        message = f"После закрытия окна основной интерфейс будет обновлен\nс учетом удаленных данных."
+        wx.MessageBox(message, "Оповещение", wx.OK | wx.ICON_INFORMATION)
+
+        # Вызываем стандартное событие закрытия окна
         self.Destroy()
+        event.Skip()
+
+        # Получаем объект главного окна приложения
+        main_obj = self.parent_dialog
+        print(f'родитель======== {main_obj}')
+        # Обновляем данные в главном окне
+        main_obj.update_main_window()
 
 
 ###########################################################################
@@ -100,6 +116,9 @@ class PanelDelModule(wx.Panel):
 
     def __init__(self, parent, id=wx.ID_ANY, pos=wx.DefaultPosition, size=wx.Size(-1, -1), style=wx.TAB_TRAVERSAL, name="Удалить МОДУЛЬ"):
         wx.Panel.__init__(self, parent, id=id, pos=pos, size=size, style=style, name=name)
+
+        self.parent_dialog = parent  # Родитель окна
+
         # Главный сайзер окна
         sizer_main_panel_del_mod = wx.BoxSizer(wx.VERTICAL)
         sizer_main_panel_del_mod.SetMinSize(wx.Size(600, 600))
@@ -123,14 +142,14 @@ class PanelDelModule(wx.Panel):
 
         # Сайзер данных
         sizer_data = wx.BoxSizer(wx.VERTICAL)
-        self.info_cmd_label = wx.StaticText(self, wx.ID_ANY, "Связанные команды с модулем будут автоматически удалены:", wx.DefaultPosition, wx.DefaultSize, 0)
+        self.info_cmd_label = wx.StaticText(self, wx.ID_ANY, "ВНИМАНИЕ !!! Связанные команды будут автоматически удалены:", wx.DefaultPosition, wx.DefaultSize, 0)
         self.info_cmd_label.Wrap(-1)
         sizer_data.Add(self.info_cmd_label, 0, wx.ALL, 5)
         # Скроллинг для окна
         self.scrolled_window = wx.ScrolledWindow(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.HSCROLL | wx.VSCROLL)
         self.scrolled_window.SetScrollRate(15, 15)
         sizer_data.Add(self.scrolled_window, 1, wx.EXPAND | wx.ALL, 5)
-        
+
         sizer_main_panel_del_mod.Add(sizer_data, 1, wx.EXPAND, 5)
 
         # Сайзер кнопок
@@ -144,6 +163,8 @@ class PanelDelModule(wx.Panel):
         self.Layout()
         # Привязываем обработчик события к выбору модуля
         self.choice_mod.Bind(wx.EVT_CHOICE, self.on_module_select)
+        # Привязываем обработчик для кнопки Применить
+        self.button_apply.Bind(wx.EVT_BUTTON, self.del_module)
 
     # -------------------------- Обработчики ------------------------------
     def on_module_select(self, event):
@@ -156,7 +177,7 @@ class PanelDelModule(wx.Panel):
         if self.scrolled_window.GetSizer():
             # Удаляем старый сайзер
             self.scrolled_window.DestroyChildren()
-
+        # Добавляем команды
         for cmd in commands:
             btn_cmd = wx.Button(self.scrolled_window, wx.ID_ANY, cmd['commands_name'], wx.DefaultPosition, wx.DefaultSize, 0)
             btn_cmd.Enable(False)
@@ -164,18 +185,39 @@ class PanelDelModule(wx.Panel):
             self.scrolled_window.Layout()
 
         self.scrolled_window.SetSizer(sizer_cmd_list)
+        # Перестраиваем элементы в сайзере
         sizer_cmd_list.Fit(self.scrolled_window)
         self.Layout()
+
+    def del_module(self, event):
+        """Удаление модуля с его командами"""
+        selected_module = self.choice_mod.GetStringSelection()  # Получаем имя выбранного модуля
+        # Удаляем модуль и его команды из БД
+        del_module(selected_module)
+
+        # Обновляем список модулей в choice_mod
+        choice_modChoices = [mod_item['module_name'] for mod_item in request_to_get_all_modules()]
+        self.choice_mod.SetItems(choice_modChoices)
+
+        # Очищаем окно от команд, которые были удалены
+        if self.scrolled_window.GetSizer():
+            sizer_cmd_list = self.scrolled_window.GetSizer()
+            sizer_cmd_list.Clear(delete_windows=True)
+            self.scrolled_window.Layout()
+            self.Layout()
 
 
 ###########################################################################
 # Class PanelDelCommand
 ###########################################################################
 class PanelDelCommand(wx.Panel):
-    """Центральная панель"""
+    """Удалить команду"""
 
     def __init__(self, parent, id=wx.ID_ANY, pos=wx.DefaultPosition, size=wx.Size(-1, -1), style=wx.TAB_TRAVERSAL, name=wx.EmptyString):
         wx.Panel.__init__(self, parent, id=id, pos=pos, size=size, style=style, name=name)
+
+        self.parent_dialog = parent  # Родитель окна
+
         # Главный сайзер окна
         sizer_main_panel_del_cmd = wx.BoxSizer(wx.VERTICAL)
         sizer_main_panel_del_cmd.SetMinSize(wx.Size(600, 600))
@@ -236,8 +278,6 @@ class PanelDelCommand(wx.Panel):
             tab.Layout()
 
         for cmd_obj in lst_cmd:  # Добавляем текст вкладки из списка
-            # имя команды - cmd_obj['commands_name']
-            # описание команды - cmd_obj['description']
             # ---------------------------------------------------------
             sizer_cmd = wx.BoxSizer(wx.HORIZONTAL)  # Создаем новый сайзер-КОМАНДЫ
             # Кнопки ИМЯ команды
@@ -267,4 +307,3 @@ class PanelDelCommand(wx.Panel):
         # Обновляем расположение элементов в вкладке
         tab.scrol_wind.Layout()
         tab.Layout()
-        # TODO после удаления команды нужно обновить данные на главной странице (удаленные команды остаются в списке)

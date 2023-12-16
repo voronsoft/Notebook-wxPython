@@ -1,7 +1,7 @@
 import os
 from sqlalchemy import create_engine, func
-from db.models import Module, Command
 from sqlalchemy.orm import sessionmaker
+from db.models import Module, Command, CommandModuleAssociation
 
 # Получаем корневую директорию проекта
 root_directory = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -179,4 +179,32 @@ def edit_module(name, description):
 # Функция удаления МОДУЛЯ и связанных с ним команд.
 def del_module(name_mod):
     """Функция удаления МОДУЛЯ и связанных с ним команд."""
-    ...
+    with Session() as session:
+        try:
+            # Ищем модуль по имени
+            existing_module = session.query(Module).filter_by(module_name=name_mod).first()
+
+            # Проверяем, найден ли модуль
+            if existing_module is not None:
+                # Получаем связанные с модулем команды
+                related_commands = existing_module.commands
+                # Удаляем модуль из БД
+                session.delete(existing_module)
+                session.commit()
+                # Удаляем связанные с модулем команды
+                for command in related_commands:
+                    session.delete(command)
+
+                session.commit()  # Фиксируем удаление команд
+
+                # Возвращаем информацию об удалении
+                print(f"Модуль {name_mod} успешно удален, вместе с {len(related_commands)} связанными командами.")
+                return True
+            else:
+                print(f"Модуль {name_mod} не найден в БД.")
+                return False
+        except Exception as e:
+            # Ошибка при удалении из БД данных о модуле или командах
+            print(f"Ошибка при удалении модуля {name_mod}: {e}")
+            session.rollback()  # Откатываем изменения в случае ошибки
+            return 'error'
