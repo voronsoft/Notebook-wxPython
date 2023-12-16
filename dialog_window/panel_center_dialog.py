@@ -115,11 +115,11 @@ class PanelCenter(wx.Panel):
             # ---------------------------------------------------------
 
             # --------------- Связываем событие с обработчиками -------
-            # Открытие окна при нажатии (левой кнопкой мыши) на имени и описании команды
+            # Открытие окна "ПОДРОБНО О КОМАНДЕ" при нажатии (левой кнопкой мыши) на имени и описании команды
             cmd_name.Bind(wx.EVT_LEFT_DOWN, lambda event, cmd=cmd_obj: self.show_command_details(cmd))  # - на название команды
             cmd_descr.Bind(wx.EVT_LEFT_DOWN, lambda event, cmd=cmd_obj: self.show_command_details(cmd))  # - на описание команды
 
-            # Открытие контекстного меню при нажатии (правой кнопкой мыши) на имени команды
+            # Открытие контекстного меню при нажатии (правой кнопкой мыши) на названии команды
             # - Копировать - в буфер обмена
             # - Подробно - открывает окно с подробной информацией
             cmd_name.Bind(wx.EVT_RIGHT_DOWN, lambda event, cmd=cmd_obj: self.show_context_menu(cmd))
@@ -143,7 +143,7 @@ class PanelCenter(wx.Panel):
         dialog.Destroy()
 
     def show_context_menu(self, data):
-        """Функция для контекстного меню"""
+        """Функция контекстного меню"""
         # Создаем меню
         context_menu = wx.Menu()
 

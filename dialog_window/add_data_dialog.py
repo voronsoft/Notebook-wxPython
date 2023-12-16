@@ -1,6 +1,8 @@
 import wx
 import wx.xrc
 import wx.richtext
+from utils import database_queries
+from utils.database_queries import request_to_get_all_modules
 
 
 ###########################################################################
@@ -113,15 +115,15 @@ class PanelAddCommand(wx.Panel):
         self.cmd_label.Wrap(-1)
         sizer_top_inf.Add(self.cmd_label, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5)
         #
-        self.choice_label = wx.StaticText(self, wx.ID_ANY, "Список модулей:", wx.DefaultPosition, wx.Size(250, -1), wx.ALIGN_CENTER_HORIZONTAL)
+        self.choice_label = wx.StaticText(self, wx.ID_ANY, "Подключить к модулю:", wx.DefaultPosition, wx.Size(250, -1), wx.ALIGN_CENTER_HORIZONTAL)
         self.choice_label.Wrap(-1)
         sizer_top_inf.Add(self.choice_label, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5)
-        # Поле имя команды
+        # Поле название - "Команда:"
         self.cmd_data_name = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size(250, -1), 0 | wx.BORDER_STATIC)
         self.cmd_data_name.SetMaxSize(wx.Size(300, -1))
         sizer_top_inf.Add(self.cmd_data_name, 0, wx.BOTTOM | wx.EXPAND | wx.LEFT | wx.RIGHT, 5)
-        # Поле выбора модуля
-        choice_module_dataChoices = []
+        # Поле выбора - "Подключить к модулю:"
+        choice_module_dataChoices = [mod_item['module_name'] for mod_item in request_to_get_all_modules()]  # Получаем список модулей
         self.choice_module_data = wx.Choice(self, wx.ID_ANY, wx.DefaultPosition, wx.Size(250, -1), choice_module_dataChoices, 0 | wx.BORDER_SIMPLE)
         self.choice_module_data.SetSelection(0)
         self.choice_module_data.SetMaxSize(wx.Size(300, -1))
@@ -135,14 +137,14 @@ class PanelAddCommand(wx.Panel):
         self.cmd_description_label = wx.StaticText(self, wx.ID_ANY, "Описание:", wx.DefaultPosition, wx.DefaultSize, 0)
         self.cmd_description_label.Wrap(-1)
         sizer_data_descr.Add(self.cmd_description_label, 0, wx.ALL, 5)
-        # Поле описание команды
+        # Поле - "Описание:"
         self.cmd_description_data = wx.richtext.RichTextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 | wx.BORDER_SIMPLE | wx.HSCROLL | wx.VSCROLL | wx.WANTS_CHARS)
         sizer_data_descr.Add(self.cmd_description_data, 1, wx.EXPAND | wx.ALL, 5)
         #
         self.cmd_example_label = wx.StaticText(self, wx.ID_ANY, "Пример:", wx.DefaultPosition, wx.DefaultSize, 0)
         self.cmd_example_label.Wrap(-1)
         sizer_data_descr.Add(self.cmd_example_label, 0, wx.ALL, 5)
-        # Поле примера для команды
+        # Поле - "Пример:"
         self.cmd_example_data = wx.richtext.RichTextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 | wx.BORDER_SIMPLE | wx.HSCROLL | wx.VSCROLL | wx.WANTS_CHARS)
         sizer_data_descr.Add(self.cmd_example_data, 1, wx.EXPAND | wx.ALL, 5)
 
@@ -154,9 +156,55 @@ class PanelAddCommand(wx.Panel):
         sizer_bottom.Add(self.button_apply, 0, wx.ALIGN_RIGHT | wx.ALL, 5)
         sizer_main_panel_cmd.Add(sizer_bottom, 0, wx.EXPAND, 5)
 
+        # Привязываем событие для кнопки - "Применить"
+        self.button_apply.Bind(wx.EVT_BUTTON, self.on_btn_apply)
+
         self.SetSizer(sizer_main_panel_cmd)
         self.Layout()
         sizer_main_panel_cmd.Fit(self)
+
+    # TODO добавить обновление интерфейса главного окна, после закрытия окна !!!
+    # --------------Обработчики событий --------------
+    def on_btn_apply(self, event):
+        """"Добавление команды в БД"""
+        name_cmd_new = self.cmd_data_name.GetValue()  # Получаем Название
+        descr_cmd_new = self.cmd_description_data.GetValue()  # Получаем описание
+        example_cmd_new = self.cmd_example_data.GetValue()  # Получаем пример использования
+        assoc_mod = self.choice_module_data.GetSelection()  # Получаем модуль к которому присоединяется команда
+
+        if len(name_cmd_new) >= 2 and len(descr_cmd_new) >= 5 and assoc_mod >= 0:
+            # Получение значения индекса выбранного модуля
+            selection_index_choice = self.choice_module_data.GetSelection()
+            # Получаем текстовое значение поля выбора
+            name_text_choice = self.choice_module_data.GetString(selection_index_choice)
+            # Получаем объект-модуля из БД по текстовому значению из поля выбора choice
+            mod_obj = database_queries.request_get_module(name_text_choice)
+
+            if mod_obj:  # Если объект существует
+                # Добавляем команду в БД
+                result = database_queries.add_command(name_cmd_new, descr_cmd_new, example_cmd_new, mod_obj)
+                if result:
+                    # Оповещение
+                    message = f"Новая Команда '{name_cmd_new}'добавлена в БД"
+                    wx.MessageBox(message, "Оповещение", wx.OK | wx.ICON_INFORMATION)
+                    # Очищаем поля
+                    self.cmd_data_name.Clear()
+                    self.cmd_description_data.Clear()
+                    self.cmd_example_data.Clear()
+                    self.choice_module_data.SetSelection(-1)
+                elif result == 'error':
+                    # Оповещение
+                    message = f"Ошибка при добавлении команды: '{name_cmd_new}'\nПовторите попытку."
+                    wx.MessageBox(message, "Ошибка", wx.OK | wx.ICON_ERROR)
+                    # Очищаем поля
+                else:
+                    message = f"Команда: '{name_cmd_new}'\nУже есть в БД."
+                    wx.MessageBox(message, "Найдено совпадение", wx.OK | wx.ICON_WARNING)
+        else:
+            # Отображаем диалоговое окно с сообщением
+            message = (f"Необходимо ввести данные:\nНазвание >= 2 знаков.\n"
+                       f"Описание >= 5 знаков.\nПример не обязательно\nВыбрать модуль для связи.")
+            wx.MessageBox(message, "Оповещение", wx.OK | wx.ICON_WARNING)
 
 
 ###########################################################################
@@ -177,7 +225,7 @@ class PanelAddModule(wx.Panel):
         self.mod_name_label = wx.StaticText(self, wx.ID_ANY, "Модуль:", wx.DefaultPosition, wx.Size(250, -1), wx.ALIGN_CENTER_HORIZONTAL)
         self.mod_name_label.Wrap(-1)
         sizer_top_inf.Add(self.mod_name_label, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5)
-        #  Поле имя модуля
+        #  Поле ввода названия модуля
         self.mod_data_name = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size(250, -1), 0 | wx.BORDER_SIMPLE)
         self.mod_data_name.SetMaxSize(wx.Size(300, -1))
         sizer_top_inf.Add(self.mod_data_name, 0, wx.BOTTOM | wx.EXPAND | wx.LEFT | wx.RIGHT, 5)
@@ -201,9 +249,42 @@ class PanelAddModule(wx.Panel):
         sizer_bottom.Add(self.button_apply, 0, wx.ALIGN_RIGHT | wx.ALL, 5)
         sizer_main_panel_mod.Add(sizer_bottom, 0, wx.EXPAND, 5)
 
+        # Привязываем событие для кнопки - "Применить"
+        self.button_apply.Bind(wx.EVT_BUTTON, self.on_btn_apply)
+
         self.SetSizer(sizer_main_panel_mod)
         self.Layout()
         sizer_main_panel_mod.Fit(self)
+
+    # --------------Обработчики событий --------------
+    def on_btn_apply(self, event):
+        """"Добавление модуля в БД"""
+        # TODO добавить обновление интерфейса главного окна, после закрытия окна !!!
+        name_mod = self.mod_data_name.GetValue()  # Получаем Название
+        descr_mod = self.mod_description_data.GetValue()  # Получаем описание
+
+        if len(name_mod) >= 3 and len(descr_mod) >= 5:
+            # Добавляем модуль в БД
+            answer = database_queries.add_module(name_mod, descr_mod)
+            if answer:
+                # Оповещение
+                message = f"Новый модуль '{name_mod}'добавлен в БД"
+                wx.MessageBox(message, "Оповещение", wx.OK | wx.ICON_INFORMATION)
+                # Очищаем поля
+                self.mod_data_name.Clear()
+                self.mod_description_data.Clear()
+            elif answer == 'error':
+                # Оповещение
+                message = f"Ошибка при добавлении модуля: '{name_mod}'\nПовторите попытку."
+                wx.MessageBox(message, "Ошибка", wx.OK | wx.ICON_ERROR)
+                # Очищаем поля
+            else:
+                message = f"Модуль: '{name_mod}'\nУже есть в БД."
+                wx.MessageBox(message, "Найдено совпадение", wx.OK | wx.ICON_WARNING)
+        else:
+            # Отображаем диалоговое окно с сообщением
+            message = f"Необходимо ввести данные:\nНазвание (не менее 3 знака).\nОписание (не менее 5 знаков)."
+            wx.MessageBox(message, "Оповещение", wx.OK | wx.ICON_WARNING)
 
 
 ###########################################################################
@@ -240,20 +321,20 @@ class PanelEditCommand(wx.Panel):
 
         sizer_main.Add(sizer_top, 0, wx.EXPAND | wx.RIGHT | wx.LEFT, 5)
 
-        # Сайзер описание модуля
+        # Сайзер данных (описание и пример команды)
         sizer_data = wx.BoxSizer(wx.VERTICAL)
 
         self.description_label = wx.StaticText(self, wx.ID_ANY, "Описание:", wx.DefaultPosition, wx.DefaultSize, 0)
         self.description_label.Wrap(-1)
         sizer_data.Add(self.description_label, 0, wx.ALL, 5)
-        # Поле описания команды
+        # Поле описание команды
         self.description_data = wx.richtext.RichTextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 | wx.BORDER_SIMPLE | wx.HSCROLL | wx.VSCROLL | wx.WANTS_CHARS)
         sizer_data.Add(self.description_data, 1, wx.EXPAND | wx.ALL, 5)
 
         self.example_label = wx.StaticText(self, wx.ID_ANY, "Пример:", wx.DefaultPosition, wx.DefaultSize, 0)
         self.example_label.Wrap(-1)
         sizer_data.Add(self.example_label, 0, wx.ALL, 5)
-        # Поле с примером использования команды
+        # Поле с примером
         self.example_data = wx.richtext.RichTextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 | wx.BORDER_SIMPLE | wx.HSCROLL | wx.VSCROLL | wx.WANTS_CHARS)
         sizer_data.Add(self.example_data, 1, wx.EXPAND | wx.ALL, 5)
 

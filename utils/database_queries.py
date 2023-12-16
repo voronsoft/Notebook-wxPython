@@ -1,7 +1,7 @@
 import os
-from sqlalchemy import create_engine, func
+from db.models import Module, Command
 from sqlalchemy.orm import sessionmaker
-from db.models import Module, Command, CommandModuleAssociation
+from sqlalchemy import create_engine, func
 
 # Получаем корневую директорию проекта
 root_directory = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -34,32 +34,24 @@ def request_to_get_all_modules():
             return []
 
 
-# Функция для выполнения запроса и получения данных о командах
-# def request_get_commands(modul_name=None):
-#     """Получение списка команд исходя из названия модуля (modul_name)."""
-#     with Session() as session:
-#         try:
-#             if modul_name:
-#                 # Если modul_name задан, фильтруем команды по ассоциированным модулям
-#                 commands = session.query(Command).join(Command.modules).filter(Module.module_name == modul_name).all()
-#                 # Преобразуем результат в список словарей для удобства использования
-#                 commands_data = []
-#                 for command in commands:
-#                     data = {
-#                         'id': command.id,
-#                         'commands_name': command.command_name,
-#                         'description_command': command.description,
-#                         'command_example:': command.example,
-#                         'cmd_assoc_module': tuple(*[(module.module_name, module.id) for module in command.modules])
-#                     }
-#                     commands_data.append(data)
-#                 return commands_data
-#
-#         except Exception as e:
-#             # Обрабатываем возможные ошибки, например, выводим сообщение об ошибке
-#             print(f"Ошибка при получении списка команд: {e}")
-#             return []
-# Функция для получения списка команд связанных с модулем
+# Функция получения объект-модуля по названию
+def request_get_module(name_mod_str):
+    """Получение объекта-модуля по названию"""
+    with Session() as session:
+        try:
+            # Получаем объект-модуля
+            module_obj = session.query(Module).filter_by(module_name=name_mod_str).first()
+            if module_obj:
+                return module_obj
+            else:
+                return False
+        except Exception as e:
+            # Выводим сообщение об ошибке
+            print(f"Ошибка при получении объекта-модуля: {e}")
+            return 'error'
+
+
+# Функция получение списка команд исходя из названия модуля (modul_name)
 def request_get_commands(modul_name):
     """Получение списка команд исходя из названия модуля (modul_name)."""
     with Session() as session:
@@ -127,13 +119,49 @@ def show_full_command_info(command_name=None):
 
 
 # Функция добавления новой КОМАНДЫ
-def add_command(name, description, example, modules):
-    """Функция добавления новой КОМАНДЫ"""
-    ...
+def add_command(name_cmd, description, example, module_obj):
+    """
+    Функция добавления новой КОМАНДЫ
+    :param name_cmd: - имя команды (str)
+    :param description: - описание команды (str)
+    :param example: - пример описания (str)
+    :param module_obj: - модуль (для связи) (object)
+    :return: - возвращает булево значение (bool)
+    """
+    with Session() as session:
+        try:
+            # Ищем команду по имени
+            existing_cmd = session.query(Command).filter_by(command_name=name_cmd).first()
+
+            # Проверяем, найдена ли команда
+            if existing_cmd is None:
+                new_cmd = Command(command_name=name_cmd, description=description, example=example)
+
+                # Если module_obj - это одиночный объект, создаем список из одного элемента
+                modules_list = [module_obj] if module_obj else []
+
+                # Связываем команду с модулями
+                new_cmd.modules.extend(modules_list)
+
+                # Добавляем команду в БД
+                session.add(new_cmd)
+                session.commit()  # Фиксируем
+
+                # Возвращаем информацию о добавлении
+                print(f"Команда {name_cmd} успешно добавлена в БД.")
+                return True
+            else:
+                print(f"Команда {name_cmd} есть в БД.")
+                return False
+        except Exception as e:
+            # Ошибка при добавлении в БД команды
+            print(f"Ошибка добавления команды {name_cmd}: {e}")
+            session.rollback()  # Откатываем изменения в случае ошибки
+            return 'error'
 
 
 # Функция изменения данных КОМАНДЫ
-def edit_command(name, description, example, modules):
+def edit_command(name, description, example, module):
     """Функция изменения данных КОМАНДЫ"""
     ...
 
@@ -165,9 +193,31 @@ def del_command(cmd_obj):
 
 
 # Функция добавления нового МОДУЛЯ
-def add_module(name, description, commands):
+def add_module(name, descr):
     """Функция добавления нового МОДУЛЯ"""
-    ...
+    with Session() as session:
+        try:
+            # Ищем модуль по имени
+            existing_module = session.query(Module).filter_by(module_name=name).first()
+
+            # Проверяем, найден ли модуль
+            if existing_module is None:
+                new_module = Module(module_name=name, description=descr)
+                # Добавляем модуль в БД
+                session.add(new_module)
+                session.commit()  # Фиксируем
+
+                # Возвращаем информацию о добавлении
+                print(f"Модуль {name} успешно добавлен в БД.")
+                return True
+            else:
+                print(f"Модуль {name} есть в БД.")
+                return False
+        except Exception as e:
+            # Ошибка при добавлении в БД модуля
+            print(f"Ошибка добавлении модуля {name}: {e}")
+            session.rollback()  # Откатываем изменения в случае ошибки
+            return 'error'
 
 
 # Функция изменения данных МОДУЛЯ
