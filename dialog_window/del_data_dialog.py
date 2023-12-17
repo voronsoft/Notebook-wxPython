@@ -2,7 +2,6 @@ import wx
 import wx.xrc
 from utils import database_queries
 from dialog_window import panel_center_dialog
-from utils.database_queries import request_to_get_all_modules, request_get_commands, del_module, del_command
 
 
 # TODO после удаления команды нужно обновить данные на главной странице (удаленные команды остаются в списке)
@@ -132,7 +131,7 @@ class PanelDelModule(wx.Panel):
         sizer_top_inf.Add(self.info_mod_label, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5)
 
         # Поле выбора удаляемого модуля из списка
-        choice_modChoices = [mod_item['module_name'] for mod_item in request_to_get_all_modules()]  # Получаем список модулей
+        choice_modChoices = [mod_item['module_name'] for mod_item in database_queries.request_to_get_all_modules()]  # Получаем список модулей
         self.choice_mod = wx.Choice(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, choice_modChoices, 0)
         self.choice_mod.SetFont(wx.Font(12, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False, "Arial"))
         self.choice_mod.SetForegroundColour(wx.Colour(255, 0, 0))  # RGB цвет для красного
@@ -161,6 +160,7 @@ class PanelDelModule(wx.Panel):
         self.SetSizer(sizer_main_panel_del_mod)
         sizer_main_panel_del_mod.Fit(self)
         self.Layout()
+
         # Привязываем обработчик события к выбору модуля
         self.choice_mod.Bind(wx.EVT_CHOICE, self.on_module_select)
         # Привязываем обработчик для кнопки Применить
@@ -170,7 +170,7 @@ class PanelDelModule(wx.Panel):
     def on_module_select(self, event):
         """Обработчик события выбора модуля"""
         selected_module = self.choice_mod.GetStringSelection()  # Получаем имя выбранного модуля
-        commands = request_get_commands(selected_module)  # Запрашиваем команды для выбранного модуля
+        commands = database_queries.request_get_commands(selected_module)  # Запрашиваем команды для выбранного модуля
         # Создаем новый сайзер
         sizer_cmd_list = wx.BoxSizer(wx.VERTICAL)
 
@@ -193,10 +193,10 @@ class PanelDelModule(wx.Panel):
         """Удаление модуля с его командами"""
         selected_module = self.choice_mod.GetStringSelection()  # Получаем имя выбранного модуля
         # Удаляем модуль и его команды из БД
-        del_module(selected_module)
+        database_queries.del_module(selected_module)
 
         # Обновляем список модулей в choice_mod
-        choice_modChoices = [mod_item['module_name'] for mod_item in request_to_get_all_modules()]
+        choice_modChoices = [mod_item['module_name'] for mod_item in database_queries.request_to_get_all_modules()]
         self.choice_mod.SetItems(choice_modChoices)
 
         # Очищаем окно от команд, которые были удалены
@@ -294,7 +294,7 @@ class PanelDelCommand(wx.Panel):
 
     def del_cmd(self, event, cmd, tab):
         """Удаление команды с БД и перезагрузка (обновление) активной вкладки"""
-        del_command(cmd)  # Удаляем команду из БД
+        database_queries.del_command(cmd)  # Удаляем команду из БД
         # Обновляем флаг количества команд в объекте вкладке
         if tab.num_fields_cmd > 0:
             tab.num_fields_cmd -= 1

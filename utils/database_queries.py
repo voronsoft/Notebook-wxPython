@@ -221,9 +221,29 @@ def add_module(name, descr):
 
 
 # Функция изменения данных МОДУЛЯ
-def edit_module(name, description):
+def edit_module(select_mod_name, name_new, descr_new):
     """Функция изменения данных МОДУЛЯ"""
-    ...
+    with Session() as session:
+        try:
+            # Ищем модуль по имени
+            existing_module = session.query(Module).filter_by(module_name=select_mod_name).first()
+
+            # Проверяем, найден ли модуль
+            if existing_module is not None:
+                # Изменяем имя и описание
+                existing_module.module_name = name_new
+                existing_module.description = descr_new
+
+                # Сохраняем изменения в базе данных
+                session.commit()
+                return True
+            else:
+                return False
+        except Exception as e:
+            # Ошибка при изменении модуля
+            print(f"Ошибка при изменении модуля {select_mod_name}: {e}")
+            session.rollback()  # Откатываем изменения в случае ошибки
+            return 'error'
 
 
 # Функция удаления МОДУЛЯ и связанных с ним команд.

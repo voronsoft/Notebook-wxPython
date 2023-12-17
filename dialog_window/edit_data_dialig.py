@@ -1,6 +1,7 @@
 import wx
 import wx.xrc
 import wx.richtext
+from utils import database_queries
 
 
 ###########################################################################
@@ -95,49 +96,115 @@ class PanelEditModule(wx.Panel):
         wx.Panel.__init__(self, parent, id=id, pos=pos, size=size, style=style, name=name)
         # Главный сайзер
         sizer_main_panel_edit_mod = wx.BoxSizer(wx.VERTICAL)
-
         sizer_main_panel_edit_mod.SetMinSize(wx.Size(600, 600))
-        sizer_data = wx.BoxSizer(wx.VERTICAL)
 
+        # Сайзер с данными
+        sizer_data = wx.BoxSizer(wx.VERTICAL)
+        #
         self.choice_mod_label = wx.StaticText(self, wx.ID_ANY, "Выберите модуль:", wx.DefaultPosition, wx.DefaultSize, 0)
         self.choice_mod_label.Wrap(-1)
-
         sizer_data.Add(self.choice_mod_label, 0, wx.EXPAND | wx.TOP | wx.RIGHT | wx.LEFT, 5)
-
-        choice_modChoices = []
+        # Поле выбора модуля
+        self.lst_mod_obj = database_queries.request_to_get_all_modules()
+        choice_modChoices = [mod_item['module_name'] for mod_item in self.lst_mod_obj]  # Получаем список модулей
         self.choice_mod = wx.Choice(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, choice_modChoices, 0)
-        self.choice_mod.SetSelection(0)
-
+        self.choice_mod.SetFont(wx.Font(12, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False, "Arial"))
+        self.choice_mod.SetForegroundColour(wx.Colour(255, 0, 0))  # RGB цвет для красного
+        self.choice_mod.SetSelection(-1)
         sizer_data.Add(self.choice_mod, 0, wx.ALL | wx.EXPAND, 5)
-
-        self.name_mod_label = wx.StaticText(self, wx.ID_ANY, "Название:", wx.DefaultPosition, wx.DefaultSize, 0)
+        #
+        self.name_mod_label = wx.StaticText(self, wx.ID_ANY, "Введите новое название (или оставьте пустым):", wx.DefaultPosition, wx.DefaultSize, 0)
         self.name_mod_label.Wrap(-1)
-
         sizer_data.Add(self.name_mod_label, 0, wx.EXPAND | wx.TOP | wx.RIGHT | wx.LEFT, 5)
-
-        self.name_mod_text = wx.TextCtrl(self, wx.ID_ANY, "Модуль тест", wx.DefaultPosition, wx.DefaultSize, 0)
+        # Поле ввода названия модуля
+        self.name_mod_text = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0)
         sizer_data.Add(self.name_mod_text, 0, wx.EXPAND | wx.ALL, 5)
-
-        self.descr_mod_label = wx.StaticText(self, wx.ID_ANY, "Описание:", wx.DefaultPosition, wx.DefaultSize, 0)
+        #
+        self.descr_mod_label = wx.StaticText(self, wx.ID_ANY, "Введите описание модуля:", wx.DefaultPosition, wx.DefaultSize, 0)
         self.descr_mod_label.Wrap(-1)
-
         sizer_data.Add(self.descr_mod_label, 0, wx.EXPAND | wx.TOP | wx.RIGHT | wx.LEFT, 5)
-
-        self.descr_mod_text = wx.richtext.RichTextCtrl(self, wx.ID_ANY, "Описание модуля", wx.DefaultPosition, wx.DefaultSize, 0 | wx.VSCROLL | wx.HSCROLL | wx.NO_BORDER | wx.WANTS_CHARS)
+        # Поле ввода описания для модуля
+        self.descr_mod_text = wx.richtext.RichTextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 | wx.VSCROLL | wx.HSCROLL | wx.NO_BORDER | wx.WANTS_CHARS)
         sizer_data.Add(self.descr_mod_text, 1, wx.EXPAND | wx.ALL, 5)
 
         sizer_main_panel_edit_mod.Add(sizer_data, 1, wx.EXPAND, 5)
 
+        # Сайзер кнопок
         sizer_bottom = wx.BoxSizer(wx.VERTICAL)
-
         self.button_apply = wx.Button(self, wx.ID_ANY, "Применить", wx.DefaultPosition, wx.DefaultSize, 0)
         sizer_bottom.Add(self.button_apply, 0, wx.ALIGN_RIGHT | wx.ALL, 5)
 
         sizer_main_panel_edit_mod.Add(sizer_bottom, 0, wx.EXPAND, 5)
 
+        # Привязываем обработчик события к выбору модуля
+        self.choice_mod.Bind(wx.EVT_CHOICE, self.on_module_select)
+        # Привязываем событие для кнопки - "Применить"
+        self.button_apply.Bind(wx.EVT_BUTTON, self.on_btn_apply)
+
         self.SetSizer(sizer_main_panel_edit_mod)
         self.Layout()
         sizer_main_panel_edit_mod.Fit(self)
+
+    # -------------- Обработчики событий ----------------
+    def on_btn_apply(self, event):
+        """Изменение данных о модуле"""
+        # Получаем название выбранного модуля
+        select_mod_name = self.choice_mod.GetStringSelection()  # Получаем имя выбранного модуля
+        name_new = self.name_mod_text.GetValue()  # Новое название модуля
+        descr_new = self.descr_mod_text.GetValue()  # Новое описание модуля
+        result = database_queries.edit_module(select_mod_name, name_new, descr_new)  # Изменяем данные
+
+        if result:
+            # Оповещение
+            message = f"Модуль '{select_mod_name}'изменён."
+            wx.MessageBox(message, "Оповещение", wx.OK | wx.ICON_INFORMATION)
+
+            # Очищаем поля
+            self.choice_mod.SetSelection(-1)
+            self.name_mod_text.Clear()
+            self.descr_mod_text.Clear()
+
+            # Обновляем список модулей в поле выбора
+            self.lst_mod_obj = database_queries.request_to_get_all_modules()
+            choice_modChoices = [mod_item['module_name'] for mod_item in self.lst_mod_obj]
+            self.choice_mod.Clear()
+            self.choice_mod.AppendItems(choice_modChoices)
+            self.choice_mod.SetSelection(-1)
+            self.Layout()
+
+        elif result == 'error':
+            # Оповещение
+            message = f"Ошибка при изменении модуля: '{select_mod_name}'\nПовторите попытку."
+            wx.MessageBox(message, "Ошибка", wx.OK | wx.ICON_ERROR)
+        else:
+            message = f"Модуль: '{select_mod_name}' не найден в БД."
+            wx.MessageBox(message, "Нет совпадений", wx.OK | wx.ICON_WARNING)
+
+    def on_module_select(self, event):
+        """Обработчик события выбора модуля"""
+        # Получаем название выбранного модуля
+        selected_module_name = self.choice_mod.GetStringSelection()  # Получаем имя выбранного модуля
+        # Получаем описание модуля
+        descr_mod = ''.join(i['description'] for i in self.lst_mod_obj if selected_module_name in i.values())
+
+        # Заполняем поля данными
+        if self.name_mod_text.GetValue() or self.descr_mod_text.GetValue():
+            # Если поля что то содержат, очищаем поля
+            self.name_mod_text.Clear()
+            self.descr_mod_text.Clear()
+
+        self.name_mod_text.SetValue(selected_module_name)
+        self.descr_mod_text.SetValue(descr_mod)
+
+    # -------------- Функции ----------------
+    def update_module_choices(self):
+        """Обновляет список модулей в поле выбора"""
+        self.lst_mod_obj = database_queries.request_to_get_all_modules()
+        choice_modChoices = [mod_item['module_name'] for mod_item in self.lst_mod_obj]
+        self.choice_mod.Clear()
+        self.choice_mod.AppendItems(choice_modChoices)
+        self.choice_mod.SetSelection(-1)
+        self.Layout()
 
 
 ###########################################################################
