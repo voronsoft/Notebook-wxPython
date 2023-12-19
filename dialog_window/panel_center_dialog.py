@@ -1,7 +1,7 @@
 import wx
 from utils import database_queries
-from dialog_window.add_data_dialog import AddCommandOrModule
 from dialog_window.view_command_dialog import ViewCommandData
+from dialog_window.edit_data_dialig import EditCommandOrModule
 
 
 ###########################################################################
@@ -18,9 +18,6 @@ class PanelCenter(wx.Panel):
         self.notebook = wx.Notebook(self, wx.ID_ANY, wx.DefaultPosition, wx.Size(-1, -1), 0)
         sizer_main_panel.Add(self.notebook, 1, wx.EXPAND | wx.ALL, 5)
 
-        self.SetSizer(sizer_main_panel)
-        self.Layout()
-
         # Добавляем вкладки в главную панель
         self.add_tabs()
 
@@ -28,37 +25,33 @@ class PanelCenter(wx.Panel):
         self.list_tabs_mod = [self.notebook.GetPage(i) for i in range(self.notebook.GetPageCount())]
 
         # TODO если удалить все модули то приложение не запускается из за ошибки в строке 31
-        # ######################################
-        # Загружаем данные для первой вкладки при запуске главной страницы (что-бы страница не была пустой)
+        # ######### Загружаем данные для первой вкладки при запуске главной страницы (что-бы страница не была пустой)
+        # Если вкладка пустая (без команд)
         if self.list_tabs_mod[0].scrol_wind.GetSizer().GetItemCount() == 0:
             first_tab = self.list_tabs_mod[0]
             # Запускаем загрузку команд для активной вкладки
             name_first_tb = self.notebook.GetPageText(0)
             self.add_cmd_to_tab(first_tab, name_first_tb)
 
-        elif self.list_tabs_mod[0].scrol_wind.GetSizer().GetItemCount() > 0:
-            name_mod = self.notebook.GetPageText(0)  # Получаем имя первой вкладки
-            num_cmd_mod_obj = self.list_tabs_mod[0].num_fields_cmd  # Получаем кол команд в объекте
-            num_cmd_mod_db = database_queries.count_commands_in_module(name_mod)  # Получаем кол команд из БД
-            if num_cmd_mod_db != num_cmd_mod_obj:
-                print(f'Количество команд:')
-                print(f'В объекте: {num_cmd_mod_obj}')
-                print(f'В БД для объекта: {num_cmd_mod_db}')
-
-        # ######################################
-
         # Привязываем событие выбора вкладки
         self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.on_page_changed, self.notebook)
+
+        self.SetSizer(sizer_main_panel)
+        self.Layout()
 
     def add_tabs(self):
         """Функция для добавления вкладок в notebook"""
         # Получаем список объектов модулей из Бд
         lst_modules = database_queries.request_to_get_all_modules()
+        self.Freeze()  # Замораживаем обновление окна (убираем мерцание экрана при обновлении)
         for mod in lst_modules:
             mod_name = mod['module_name']
             tab = TabModule(self.notebook)  # Экземпляр вкладки
             # Добавляем объекты вкладки в список объект self.notebook
             self.notebook.AddPage(tab, mod_name, False)
+
+        self.Thaw()  # Размораживаем обновление окна (убираем мерцание экрана при обновлении)
+        self.Layout()
 
     def on_page_changed(self, event):
         """Обработчик события выбираемой вкладки"""
@@ -92,6 +85,7 @@ class PanelCenter(wx.Panel):
         lst_cmd = database_queries.request_get_commands(name_mod)
         sizer_all_cmd = tab.scrol_wind.GetSizer()  # Получаем из scrol_wind(скроллинг) дочерний сайзер sizer_all_cmd (сайзер для списка команд)
 
+        self.Freeze()  # Замораживаем обновление окна (убираем мерцание экрана при обновлении)
         for cmd_obj in lst_cmd:  # Добавляем текст вкладки из списка
             # имя команды - cmd_obj['commands_name']
             # описание команды - cmd_obj['description']
@@ -110,8 +104,6 @@ class PanelCenter(wx.Panel):
             sizer_cmd.Add(cmd_descr, 1, wx.EXPAND | wx.TOP | wx.BOTTOM | wx.RIGHT, 5)
 
             sizer_all_cmd.Add(sizer_cmd, 0, wx.EXPAND, 5)
-            # Плавная загрузка
-            tab.scrol_wind.Layout()
             # ---------------------------------------------------------
 
             # --------------- Связываем событие с обработчиками -------
@@ -127,8 +119,10 @@ class PanelCenter(wx.Panel):
 
         # Отмечаем в объекте у флага num_fields_cmd количество загруженных команд
         tab.num_fields_cmd = tab.scrol_wind.GetSizer().GetItemCount()
-        # Обновляем расположение элементов в вкладке
-        tab.Layout()
+        # Перерисовываем интерфейс
+        tab.scrol_wind.Layout()
+        self.Thaw()  # Размораживаем обновление окна (убираем мерцание экрана при обновлении)
+        tab.Layout()  # Обновляем расположение элементов в вкладке
 
     # Обработчики
     def show_command_details(self, command):
@@ -157,7 +151,7 @@ class PanelCenter(wx.Panel):
 
         # Добавляем опцию "Изменить"
         edit_item = context_menu.Append(wx.ID_ANY, "Изменить")
-        self.Bind(wx.EVT_MENU, lambda event, cmd=data: self.edit_command(cmd), edit_item)
+        self.Bind(wx.EVT_MENU, lambda event, cmd=data: self.edit_cmd(cmd), edit_item)
 
         # Показываем контекстное меню
         self.PopupMenu(context_menu)
@@ -172,28 +166,37 @@ class PanelCenter(wx.Panel):
             wx.TheClipboard.Close()
 
     # Обработчик для опции "Изменить"
-    def edit_command(self, command):
-        """Функция для редактирования команды"""
-        edit_dialog = AddCommandOrModule(parent=self)  # Создаем экземпляр класса
-        # делаем активной радиокнопку Изменить КОМАНДУ
-        edit_dialog.radio_edit_command.SetValue(True)
-        # Скрываем радио-кнопки (добавить команду/модуль)
-        edit_dialog.radio_add_command.Hide()
-        edit_dialog.radio_add_module.Hide()
-        # Явно вызываем обработчик, чтобы загрузить соответствующую панель в динамический сайзер
-        edit_dialog.on_radio_change(None)
+    def edit_cmd(self, command):
+        """Функция для редактирования команды из контекстного меню"""
+        edit_dialog = EditCommandOrModule(parent=self)  # Создаем экземпляр класса
+        edit_dialog.radio_edit_command.SetValue(True)  # Делаем активной радиокнопку - Изменить КОМАНДУ
+        edit_dialog.radio_edit_module.SetValue(False)  # Параллельно деактивируем кнопку - Изменить МОДУЛЬ
+        edit_dialog.radio_edit_module.Hide()  # Скрываем кнопку - "Изменить МОДУЛЬ"
 
-        # Задаем полям значения
-        # Устанавливаем значения в поля динамической панели
-        edit_dialog.sizer_DYNAMIC.GetChildren()[0].GetWindow().set_values(
-            command['commands_name'],
-            command['cmd_assoc_module'][0],
-            command['description_command'],
-            command['command_example:']
-        )
+        # Получаем объект окна - изменение команды
+        edit_wnd = edit_dialog.GetChildren()[-1]
+        # Скрываем нужный сайзер в окне, так как команда редактируется из контекстного меню
+        edit_wnd.hide_child_elements('ctx')
+        # Заполняем форму данными от команды которую будем изменять
+        edit_wnd.new_name_inp_text.SetValue(command['commands_name'])
+        edit_wnd.descr_inp_text.SetValue(command['description_command'])
+        edit_wnd.exampl_inp_text.SetValue(command['command_example:'])
 
-        edit_dialog.ShowModal()
+        # Привязываем событие для кнопки "Применить", в созданном объекте(edit_dialog)
+        # Передаем данные в обработчик
+        name_new = edit_wnd.new_name_inp_text.GetValue()  # Название
+        descr_new = edit_wnd.descr_inp_text.GetValue()  # Описание
+        example_new = edit_wnd.exampl_inp_text.GetValue()  # Пример
+        edit_wnd.button_apply.Bind(wx.EVT_BUTTON, lambda event, cmd_data=(command, name_new, descr_new, example_new): self.on_btn_apply(cmd_data))
+        # edit_wnd.Layout()
+
+        edit_dialog.ShowModal()  # Отображаем окно
         edit_dialog.Destroy()
+
+    # ----------- Обработчик ----------
+    def on_btn_apply(self, cmd_data):
+        command, name_new, descr_new, example_new = cmd_data
+        database_queries.edit_command(command, name_new, descr_new, example_new)
 
     # ----------- Функции ----------
     def update_cmd(self):

@@ -35,10 +35,6 @@ class AddCommandOrModule(wx.Dialog):
         # Заполнитель
         self.static_text_empty1 = wx.StaticText(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size(50, -1), 0)
         self.sizer_radio_button.Add(self.static_text_empty1, 0, wx.ALL, 5)
-        # КНОПКА - Изменить КОМАНДУ
-        self.radio_edit_command = wx.RadioButton(self, wx.ID_ANY, "Изменить КОМАНДУ", wx.DefaultPosition, wx.DefaultSize, 0)
-        self.radio_edit_command.SetFont(wx.Font(10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
-        self.sizer_radio_button.Add(self.radio_edit_command, 0, wx.ALL | wx.EXPAND, 5)
 
         # Сайзер - Разделительной линии
         self.sizer_line = wx.BoxSizer(wx.VERTICAL)
@@ -59,7 +55,6 @@ class AddCommandOrModule(wx.Dialog):
         # Привязываем обработчик on_radio_change к событию изменения радио кнопок
         self.radio_add_command.Bind(wx.EVT_RADIOBUTTON, self.on_radio_change)
         self.radio_add_module.Bind(wx.EVT_RADIOBUTTON, self.on_radio_change)
-        self.radio_edit_command.Bind(wx.EVT_RADIOBUTTON, self.on_radio_change)
         # Привязываем событие при закрытии окна
         self.Bind(wx.EVT_CLOSE, self.on_close_dialog)
 
@@ -80,10 +75,6 @@ class AddCommandOrModule(wx.Dialog):
 
         elif self.radio_add_module.GetValue():
             module_connect = PanelAddModule(self)  # Создаем экземпляр класса
-            self.sizer_DYNAMIC.Add(module_connect, 1, wx.EXPAND | wx.ALL, 5)
-
-        elif self.radio_edit_command.GetValue():
-            module_connect = PanelEditCommand(self)  # Создаем экземпляр класса
             self.sizer_DYNAMIC.Add(module_connect, 1, wx.EXPAND | wx.ALL, 5)
 
         # Перераспределяем элементы и подгоняем размер
@@ -285,77 +276,6 @@ class PanelAddModule(wx.Panel):
             # Отображаем диалоговое окно с сообщением
             message = f"Необходимо ввести данные:\nНазвание (не менее 3 знака).\nОписание (не менее 5 знаков)."
             wx.MessageBox(message, "Оповещение", wx.OK | wx.ICON_WARNING)
-
-
-###########################################################################
-# Class PanelEditCommand
-###########################################################################
-class PanelEditCommand(wx.Panel):
-    def __init__(self, parent, id=wx.ID_ANY, pos=wx.DefaultPosition, size=wx.Size(-1, -1), style=wx.TAB_TRAVERSAL, name=wx.EmptyString):
-        wx.Panel.__init__(self, parent, id=id, pos=pos, size=size, style=style, name=name)
-
-        self.SetSizeHints(wx.DefaultSize, wx.DefaultSize)
-        self.SetFont(wx.Font(10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
-
-        # Главный сайзер
-        sizer_main = wx.BoxSizer(wx.VERTICAL)
-        sizer_main.SetMinSize(wx.Size(600, 600))
-
-        # Сайзер TOP
-        sizer_top = wx.GridSizer(0, 2, 0, 0)
-
-        self.command_name_label = wx.StaticText(self, wx.ID_ANY, "Команда:", wx.DefaultPosition, wx.Size(250, -1), wx.ALIGN_CENTER_HORIZONTAL)
-        self.command_name_label.Wrap(-1)
-        sizer_top.Add(self.command_name_label, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5)
-        self.module_name_label = wx.StaticText(self, wx.ID_ANY, "Модуль:", wx.DefaultPosition, wx.Size(250, -1), wx.ALIGN_CENTER_HORIZONTAL)
-        self.module_name_label.Wrap(-1)
-        sizer_top.Add(self.module_name_label, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5)
-        # Поле имя команды
-        self.cmd_data_name = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size(250, -1), 0 | wx.BORDER_SIMPLE)
-        self.cmd_data_name.SetMaxSize(wx.Size(300, -1))
-        sizer_top.Add(self.cmd_data_name, 0, wx.BOTTOM | wx.EXPAND | wx.LEFT | wx.RIGHT, 5)
-        # Поле имя модуля
-        self.mod_data_name = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size(250, -1), wx.TE_READONLY | wx.BORDER_SIMPLE)
-        self.mod_data_name.SetMaxSize(wx.Size(300, -1))
-        sizer_top.Add(self.mod_data_name, 0, wx.BOTTOM | wx.EXPAND | wx.LEFT | wx.RIGHT, 5)
-
-        sizer_main.Add(sizer_top, 0, wx.EXPAND | wx.RIGHT | wx.LEFT, 5)
-
-        # Сайзер данных (описание и пример команды)
-        sizer_data = wx.BoxSizer(wx.VERTICAL)
-
-        self.description_label = wx.StaticText(self, wx.ID_ANY, "Описание:", wx.DefaultPosition, wx.DefaultSize, 0)
-        self.description_label.Wrap(-1)
-        sizer_data.Add(self.description_label, 0, wx.ALL, 5)
-        # Поле описание команды
-        self.description_data = wx.richtext.RichTextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 | wx.BORDER_SIMPLE | wx.HSCROLL | wx.VSCROLL | wx.WANTS_CHARS)
-        sizer_data.Add(self.description_data, 1, wx.EXPAND | wx.ALL, 5)
-
-        self.example_label = wx.StaticText(self, wx.ID_ANY, "Пример:", wx.DefaultPosition, wx.DefaultSize, 0)
-        self.example_label.Wrap(-1)
-        sizer_data.Add(self.example_label, 0, wx.ALL, 5)
-        # Поле с примером
-        self.example_data = wx.richtext.RichTextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 | wx.BORDER_SIMPLE | wx.HSCROLL | wx.VSCROLL | wx.WANTS_CHARS)
-        sizer_data.Add(self.example_data, 1, wx.EXPAND | wx.ALL, 5)
-
-        sizer_main.Add(sizer_data, 1, wx.ALL | wx.EXPAND, 5)
-
-        # Сайзер кнопок
-        sizer_bottom = wx.BoxSizer(wx.VERTICAL)
-        self.button_apply = wx.Button(self, wx.ID_ANY, "Применить", wx.DefaultPosition, wx.DefaultSize, 0)
-        sizer_bottom.Add(self.button_apply, 0, wx.ALIGN_RIGHT | wx.ALL, 5)
-        sizer_main.Add(sizer_bottom, 0, wx.EXPAND, 5)
-
-        self.SetSizer(sizer_main)
-        self.Layout()
-        sizer_main.Fit(self)
-
-    def set_values(self, name, module, description, example):
-        """Функция принимает на вход данные о команде и задает значения нужным полям"""
-        self.cmd_data_name.SetLabel(name)
-        self.mod_data_name.SetLabel(module)
-        self.description_data.WriteText(description)
-        self.example_data.WriteText(example)
 
 
 if __name__ == '__main__':

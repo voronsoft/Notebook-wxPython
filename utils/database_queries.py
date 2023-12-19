@@ -12,7 +12,7 @@ engine = create_engine(f'sqlite:///{path_to_DB}', echo=True)  # Создаем �
 Session = sessionmaker(bind=engine)  # Создаем сессию для взаимодействия с базой данных
 
 
-# Функция для выполнения запроса и получения данных о модулях
+# Функция получения данных о модулях
 def request_to_get_all_modules():
     """Получение списка модулей из БД"""
     with Session() as session:
@@ -36,7 +36,11 @@ def request_to_get_all_modules():
 
 # Функция получения объект-модуля по названию
 def request_get_module(name_mod_str):
-    """Получение объекта-модуля по названию"""
+    """
+    Получение объекта-модуля по названию
+    :param name_mod_str: - название модуля (str)
+    :return: - object module
+    """
     with Session() as session:
         try:
             # Получаем объект-модуля
@@ -53,7 +57,11 @@ def request_get_module(name_mod_str):
 
 # Функция получение списка команд исходя из названия модуля (modul_name)
 def request_get_commands(modul_name):
-    """Получение списка команд исходя из названия модуля (modul_name)."""
+    """
+    Получение списка команд исходя из названия модуля (modul_name).
+    :param modul_name: - название (str)
+    :return: - список команд (obj)
+    """
     with Session() as session:
         try:
             # Если modul_name задан, фильтруем команды по ассоциированным модулям
@@ -94,13 +102,16 @@ def count_commands_in_module(module_name):
 
 # Функция для выполнения запроса для получения данных о конкретной команде
 def show_full_command_info(command_name=None):
-    """Получение полной информации о команде из БД"""
+    """
+    Получение полной информации о команде из БД
+    :param command_name: - название команды (str)
+    :return: - command details (dict)
+    """
     with Session() as session:
         try:
             if command_name:
                 existing_command = session.query(Command).filter_by(command_name=command_name).first()
                 if not existing_command:  # Проверяем есть ли команда
-                    print('Команда не найдена (нет совпадений, проверьте написание)')
                     return 'Команда не найдена (нет совпадений, проверьте написание)'
 
                 command_data = {'id': existing_command.id,
@@ -109,7 +120,6 @@ def show_full_command_info(command_name=None):
                                 'command_example:': existing_command.example,
                                 'cmd_assoc_module': tuple(*[(module.module_name, module.id) for module in existing_command.modules])
                                 }
-                print(command_data)
                 return command_data
 
         except Exception as e:
@@ -161,9 +171,45 @@ def add_command(name_cmd, description, example, module_obj):
 
 
 # Функция изменения данных КОМАНДЫ
-def edit_command(name, description, example, module):
-    """Функция изменения данных КОМАНДЫ"""
-    ...
+def edit_command(cmd=None, name_new=None, descr_new=None, example_new=None):
+    """
+    Функция изменения данных КОМАНДЫ
+    :param cmd: - тип или dict или num
+    :param name_new: - имя команды (str)
+    :param descr_new: - описание команды (str)
+    :param example_new: - пример описания (str)
+    :return: - возвращает булево значение (bool)
+    """
+    # TODO Доделать функцию изменения команды (логика записи в БД)
+    # Если cmd словарь, значит выполняется изменение команды из контекстного меню
+    if isinstance(cmd, dict):
+        print('Изменяется из контекстного меню')
+
+    # Если cmd чисто , значит выполняется изменение команды из списка по выбору
+    elif type(cmd) is str:
+        print('Изменяется из списка по выбору')
+
+    # with Session() as session:
+    #     try:
+    #         # Ищем команду по имени
+    #         existing_command = session.query(Command).filter_by(command_name=name_new).first()
+    #
+    #         # Проверяем, найдена ли команда
+    #         if existing_command is not None:
+    #             # Изменяем имя и описание
+    #             existing_command.command_name = name_new
+    #             existing_command.description = descr_new
+    #             existing_command.example = example_new
+    #             # Сохраняем изменения в базе данных
+    #             session.commit()
+    #             return True
+    #         else:
+    #             return False
+    #     except Exception as e:
+    #         # Ошибка при изменении команды
+    #         print(f"Ошибка при изменении модуля {name_new}: {e}")
+    #         session.rollback()  # Откатываем изменения в случае ошибки
+    #         return 'error'
 
 
 # Функция удаления КОМАНДЫ

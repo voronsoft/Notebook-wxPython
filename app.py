@@ -1,3 +1,5 @@
+from time import sleep
+
 import wx
 import wx.xrc
 from dialog_window.search_dialog import SearchDialog
@@ -8,6 +10,8 @@ from dialog_window.add_data_dialog import AddCommandOrModule
 from dialog_window.edit_data_dialig import EditCommandOrModule
 
 
+# TODO !!! Пересмотреть принцип перерисовки интерфейса если был удален модуль или команда !!!
+# Часть кода - строка 181 (def update_main_window(self):)
 ###########################################################################
 # Class FrameMain
 ###########################################################################
@@ -15,15 +19,21 @@ from dialog_window.edit_data_dialig import EditCommandOrModule
 class FrameMain(wx.Frame):
     """
     Схема расположения сайзеров
+                  MAIN
     #################################
-    #             MAIN              #
     #   #########################   #
     #   #         TOP           #   #
+    #   #########################   #
+    #                               #
     #   #########################   #
     #   #         DATA          #   #
     #   #    (PanelCenter)      #   #
     #   #########################   #
+    #                               #
+    #   #########################   #
     #   #        BOTTOM         #   #
+    #   #########################   #
+    #                               #
     #   #########################   #
     #   #     status bar        #   #
     #   #########################   #
@@ -36,13 +46,9 @@ class FrameMain(wx.Frame):
                           pos=wx.Point(1, 1), size=wx.Size(-1, -1),
                           style=wx.DEFAULT_FRAME_STYLE | wx.MAXIMIZE_BOX | wx.TAB_TRAVERSAL)
         # Устанавливаем пропорциональность окна в зависимости от разности разрешений мониторов
-        # Это гарантирует что окно при запуске программы не будет больше самого разрешения монитора
-        # и не будет сжато до состояния искажения контента в окне
         self.SetSizeHints(wx.Size(-1, -1), wx.DefaultSize)
-        # Установка цвета фона окна (белый)
-        self.SetBackgroundColour(wx.Colour(255, 255, 255))
-        # Устанавливаем минимальные размеры окна
-        self.SetMinSize(wx.Size(600, 600))
+        self.SetBackgroundColour(wx.Colour(255, 255, 255))  # Установка цвета фона окна (белый)
+        self.SetMinSize(wx.Size(600, 600))  # Устанавливаем минимальные размеры окна
 
         # Создаем системное меню
         menu_bar = wx.MenuBar()
@@ -60,8 +66,8 @@ class FrameMain(wx.Frame):
         self.Bind(wx.EVT_MENU, self.show_documentation, documentation_menu_item)
         self.Bind(wx.EVT_MENU, self.about_info, about_menu_item)
         menu_bar.Append(help_menu, "Help")
-        # Устанавливаем созданное меню
-        self.SetMenuBar(menu_bar)
+
+        self.SetMenuBar(menu_bar)  # Устанавливаем созданное меню
 
         # Главный сайзер MAIN
         sizerMain = wx.BoxSizer(wx.VERTICAL)
@@ -70,22 +76,22 @@ class FrameMain(wx.Frame):
         # Сайзер - TOP
         sizer_top_button = wx.BoxSizer(wx.HORIZONTAL)
         sizer_top_button.SetMinSize(wx.Size(600, 50))
-
+        # Кнопка - "Добавить"
         self.add_button_data = wx.Button(self, wx.ID_ANY, "Добавить", wx.DefaultPosition, wx.DefaultSize, 0)
         self.add_button_data.SetLabelMarkup("Добавить")
         self.add_button_data.SetFont(wx.Font(14, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
         sizer_top_button.Add(self.add_button_data, 1, wx.ALL | wx.EXPAND, 5)
-
+        # Кнопка - "Изменить"
         self.edit_button_data = wx.Button(self, wx.ID_ANY, "Изменить", wx.DefaultPosition, wx.DefaultSize, 0)
         self.edit_button_data.SetLabelMarkup("Изменить")
         self.edit_button_data.SetFont(wx.Font(14, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
         sizer_top_button.Add(self.edit_button_data, 1, wx.ALL | wx.EXPAND, 5)
-
+        # Кнопка - "Удалить"
         self.del_button_data = wx.Button(self, wx.ID_ANY, "Удалить", wx.DefaultPosition, wx.DefaultSize, 0)
         self.del_button_data.SetLabelMarkup("Удалить")
         self.del_button_data.SetFont(wx.Font(14, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
         sizer_top_button.Add(self.del_button_data, 1, wx.ALL | wx.EXPAND, 5)
-
+        # Кнопка - "Поиск"
         self.search_button = wx.Button(self, wx.ID_ANY, "Поиск", wx.DefaultPosition, wx.DefaultSize, 0)
         self.search_button.SetLabelMarkup("Поиск")
         self.search_button.SetFont(wx.Font(14, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
@@ -116,20 +122,17 @@ class FrameMain(wx.Frame):
 
         self.Maximize()  # Максимизируем окно на весь экран
 
-        # Подключение обработчиков
-        self.add_button_data.Bind(wx.EVT_LEFT_DOWN, self.add_data_button_click)
-        self.edit_button_data.Bind(wx.EVT_LEFT_DOWN, self.edit_data_button_click)
-        self.del_button_data.Bind(wx.EVT_LEFT_DOWN, self.del_data_button_click)
-        self.search_button.Bind(wx.EVT_LEFT_DOWN, self.search)
-        self.close_button.Bind(wx.EVT_LEFT_DOWN, self.close_program)
-
-        self.update_main_window()
+        # События для кнопок
+        self.add_button_data.Bind(wx.EVT_LEFT_DOWN, self.add_data_button_click)  # Добавить
+        self.edit_button_data.Bind(wx.EVT_LEFT_DOWN, self.edit_data_button_click)  # Изменить
+        self.del_button_data.Bind(wx.EVT_LEFT_DOWN, self.del_data_button_click)  # Удалить
+        self.search_button.Bind(wx.EVT_LEFT_DOWN, self.search)  # Поиск
+        self.close_button.Bind(wx.EVT_LEFT_DOWN, self.close_program)  # Закрыть программу
 
     # ---------------- Обработчики события---------------
     def add_data_button_click(self, event):
         """Открытие диалога добавить данные о команде или модуле"""
         add_dialog = AddCommandOrModule(self)
-        add_dialog.radio_edit_command.Hide()  # Скрываем радиокнопку - Изменить КОМАНДУ
         add_dialog.ShowModal()
         add_dialog.Destroy()
 
@@ -175,23 +178,28 @@ class FrameMain(wx.Frame):
 
     # ---------------- Функции ----------------
     def update_main_window(self):
-        """Обновление сайзера sizer_data"""
-        # Получаем текущий сайзер sizer_data
-        sizer_data = self.GetSizer().GetItem(1).GetSizer()
-
-        # Уничтожаем все элементы в текущем сайзере
-        for item in sizer_data.GetChildren():
-            item.GetWindow().Destroy()
-
-        # Создаем новый экземпляр класса PanelCenter
-        new_panel_center = PanelCenter(self)
-
-        # Добавляем новый экземпляр в сайзер sizer_data
-        sizer_data.Add(new_panel_center, 0, wx.EXPAND, 5)
-
-        # Обновляем отображение
-        self.Layout()
-        self.Refresh()
+        """Обновление сайзера sizer_data главного окна"""
+        # TODO Временно отключаем функцию обновления сайзера
+        # # Получаем текущий сайзер sizer_data
+        # sizer_data = self.GetSizer().GetItem(1).GetSizer()
+        # print(f'текущий сайзер {sizer_data}')
+        #
+        # # Замораживаем обновление экрана
+        # self.Freeze()
+        #
+        # # Уничтожаем все элементы в текущем сайзере
+        # for item in sizer_data.GetChildren():
+        #     item.GetWindow().Destroy()
+        #
+        # # Создаем новый экземпляр класса PanelCenter
+        # new_panel_center = PanelCenter(self)
+        # # Добавляем новый экземпляр в сайзер sizer_data
+        # sizer_data.Add(new_panel_center, 1, wx.EXPAND, 5)
+        #
+        # # Обновляем отображение
+        # self.Layout()
+        # self.Thaw()
+        # self.Refresh()
 
 
 if __name__ == '__main__':

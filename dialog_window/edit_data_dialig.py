@@ -13,6 +13,8 @@ class EditCommandOrModule(wx.Dialog):
     def __init__(self, parent):
         wx.Dialog.__init__(self, parent, id=wx.ID_ANY, title="Изменить данные", pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.DEFAULT_DIALOG_STYLE)
 
+        self.parent_dialog = parent  # Родитель окна
+
         self.SetSizeHints(wx.DefaultSize, wx.DefaultSize)
         self.SetFont(wx.Font(10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
         # Главный сайзер окна
@@ -23,7 +25,6 @@ class EditCommandOrModule(wx.Dialog):
         sizer_radio_button = wx.BoxSizer(wx.HORIZONTAL)
         # КНОПКА - "Изменить МОДУЛЬ"
         self.radio_edit_module = wx.RadioButton(self, wx.ID_ANY, "Изменить МОДУЛЬ", wx.DefaultPosition, wx.DefaultSize, 0)
-        self.radio_edit_module.SetValue(True)
         sizer_radio_button.Add(self.radio_edit_module, 0, wx.ALL | wx.EXPAND, 5)
         # Заполнитель
         self.static_text_empty = wx.StaticText(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size(50, -1), 0)
@@ -31,6 +32,7 @@ class EditCommandOrModule(wx.Dialog):
         # КНОПКА - "Изменить КОМАНДУ"
         self.radio_edit_command = wx.RadioButton(self, wx.ID_ANY, "Изменить КОМАНДУ", wx.DefaultPosition, wx.DefaultSize, 0)
         sizer_radio_button.Add(self.radio_edit_command, 0, wx.ALL | wx.EXPAND, 5)
+        self.radio_edit_command.SetValue(True)  # Задаем активную радио-кнопку
         sizer_main_dialog.Add(sizer_radio_button, 0, wx.ALIGN_CENTER_HORIZONTAL | wx.ALL, 5)
 
         # Сайзер разделительной линии
@@ -48,6 +50,7 @@ class EditCommandOrModule(wx.Dialog):
         # --------------------------------- END ----------------------------
 
         # Искусственно генерируем событие выбора активной радио-кнопки
+        # для первичной загрузки
         self.on_radio_change(event=self.radio_edit_module)
         # Привязываем обработчик on_radio_change к событию изменения радио кнопок
         self.radio_edit_module.Bind(wx.EVT_RADIOBUTTON, self.on_radio_change)
@@ -83,7 +86,21 @@ class EditCommandOrModule(wx.Dialog):
     # Обработчик события закрытия окна
     def on_close_dialog(self, event):
         """Закрытие диалогового окна"""
+        # Отображаем диалоговое окно с сообщением
+        message = f"После закрытия окна основной интерфейс будет обновлен."
+        wx.MessageBox(message, "Оповещение", wx.OK | wx.ICON_INFORMATION)
+
+        # Вызываем стандартное событие закрытия окна
         self.Destroy()
+        event.Skip()
+
+        main_obj = self.parent_dialog  # Получаем объект главного окна приложения
+        # Обновляем данные в главном окне
+        if main_obj.Parent is None:
+            main_obj.update_main_window()
+        else:
+            x = main_obj.Parent
+            x.update_main_window()
 
 
 ###########################################################################
@@ -133,7 +150,6 @@ class PanelEditModule(wx.Panel):
         sizer_bottom = wx.BoxSizer(wx.VERTICAL)
         self.button_apply = wx.Button(self, wx.ID_ANY, "Применить", wx.DefaultPosition, wx.DefaultSize, 0)
         sizer_bottom.Add(self.button_apply, 0, wx.ALIGN_RIGHT | wx.ALL, 5)
-
         sizer_main_panel_edit_mod.Add(sizer_bottom, 0, wx.EXPAND, 5)
 
         # Привязываем обработчик события к выбору модуля
@@ -219,52 +235,58 @@ class PanelEditCommand(wx.Panel):
         sizer_main_panel_edit_cmd = wx.BoxSizer(wx.VERTICAL)
         sizer_main_panel_edit_cmd.SetMinSize(wx.Size(600, 600))
 
-        # Сайзер для контекстного меню
-        sizer_ctx_edit_cmd = wx.GridSizer(0, 2, 0, 0)
-
+        # ============== Сайзер для контекстного меню ==============
+        self.sizer_ctx_edit_cmd = wx.GridSizer(0, 2, 0, 0)
+        # Текст - "Команда:"
         self.command_name_label = wx.StaticText(self, wx.ID_ANY, "Команда:", wx.DefaultPosition, wx.Size(250, -1), wx.ALIGN_CENTER_HORIZONTAL)
         self.command_name_label.Wrap(-1)
-        sizer_ctx_edit_cmd.Add(self.command_name_label, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5)
-
+        self.sizer_ctx_edit_cmd.Add(self.command_name_label, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5)
+        #  Текст - "Модуль:"
         self.module_name_label = wx.StaticText(self, wx.ID_ANY, "Модуль:", wx.DefaultPosition, wx.Size(250, -1), wx.ALIGN_CENTER_HORIZONTAL)
         self.module_name_label.Wrap(-1)
-        sizer_ctx_edit_cmd.Add(self.module_name_label, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5)
-
+        self.sizer_ctx_edit_cmd.Add(self.module_name_label, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5)
+        # Поле команды
         self.cmd_data_name = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size(250, -1), 0 | wx.BORDER_SIMPLE)
         self.cmd_data_name.SetMaxSize(wx.Size(300, -1))
-        sizer_ctx_edit_cmd.Add(self.cmd_data_name, 0, wx.BOTTOM | wx.EXPAND | wx.LEFT | wx.RIGHT, 5)
-
+        self.sizer_ctx_edit_cmd.Add(self.cmd_data_name, 0, wx.BOTTOM | wx.EXPAND | wx.LEFT | wx.RIGHT, 5)
+        # Поле модуля связанного с командой
         self.mod_data_name = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size(250, -1), wx.TE_READONLY | wx.BORDER_SIMPLE)
         self.mod_data_name.SetMaxSize(wx.Size(300, -1))
-        sizer_ctx_edit_cmd.Add(self.mod_data_name, 0, wx.BOTTOM | wx.EXPAND | wx.LEFT | wx.RIGHT, 5)
+        self.sizer_ctx_edit_cmd.Add(self.mod_data_name, 0, wx.BOTTOM | wx.EXPAND | wx.LEFT | wx.RIGHT, 5)
 
-        sizer_main_panel_edit_cmd.Add(sizer_ctx_edit_cmd, 0, wx.EXPAND, 5)
+        sizer_main_panel_edit_cmd.Add(self.sizer_ctx_edit_cmd, 0, wx.EXPAND, 5)
+        # ============== END Сайзер для контекстного меню ==============
 
-        # Сайзер для выбора из списка команд
-        sizer_indiv_edit_cmd = wx.BoxSizer(wx.VERTICAL)
+        # ============== Сайзер для выбора из списка команд ==============
+        self.sizer_indiv_edit_cmd = wx.BoxSizer(wx.VERTICAL)
         #
         self.choice_mod_label = wx.StaticText(self, wx.ID_ANY, "Выберите модуль:", wx.DefaultPosition, wx.DefaultSize, 0)
         self.choice_mod_label.Wrap(-1)
-        sizer_indiv_edit_cmd.Add(self.choice_mod_label, 0, wx.TOP | wx.RIGHT | wx.LEFT, 5)
+        self.sizer_indiv_edit_cmd.Add(self.choice_mod_label, 0, wx.TOP | wx.RIGHT | wx.LEFT, 5)
         # Поле выбора модуля
-        choice_modChoices = []
-        self.choice_mod = wx.Choice(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, choice_modChoices, 0)
-        sizer_indiv_edit_cmd.Add(self.choice_mod, 0, wx.ALL | wx.EXPAND, 5)
+        self.lst_mod_obj = database_queries.request_to_get_all_modules()
+        self.choice_modChoices = [mod_item['module_name'] for mod_item in self.lst_mod_obj]  # Получаем список модулей
+        self.choice_mod = wx.Choice(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, self.choice_modChoices, 0)
+        self.choice_mod.SetFont(wx.Font(12, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False, "Arial"))
+        self.choice_mod.SetForegroundColour(wx.Colour(255, 0, 0))  # RGB цвет для красного
+        self.choice_mod.SetSelection(-1)
+        self.sizer_indiv_edit_cmd.Add(self.choice_mod, 0, wx.ALL | wx.EXPAND, 5)
         #
         self.choice_cmd_label = wx.StaticText(self, wx.ID_ANY, "Выберите команду:", wx.DefaultPosition, wx.DefaultSize, 0)
-        sizer_indiv_edit_cmd.Add(self.choice_cmd_label, 0, wx.TOP | wx.RIGHT | wx.LEFT, 5)
+        self.sizer_indiv_edit_cmd.Add(self.choice_cmd_label, 0, wx.TOP | wx.RIGHT | wx.LEFT, 5)
         # Поле выбора команды
-        choice_cmdChoices = []
-        self.choice_cmd = wx.Choice(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, choice_cmdChoices, 0)
+        self.choice_cmdChoices = []
+        self.choice_cmd = wx.Choice(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, self.choice_cmdChoices, 0)
         self.choice_cmd.SetSelection(-1)
-        sizer_indiv_edit_cmd.Add(self.choice_cmd, 0, wx.ALL | wx.EXPAND, 5)
+        self.sizer_indiv_edit_cmd.Add(self.choice_cmd, 0, wx.ALL | wx.EXPAND, 5)
 
-        sizer_main_panel_edit_cmd.Add(sizer_indiv_edit_cmd, 0, wx.EXPAND, 5)
+        sizer_main_panel_edit_cmd.Add(self.sizer_indiv_edit_cmd, 0, wx.EXPAND, 5)
+        # ==============  END Сайзер для выбора из списка команд ==============
 
         # Сайзер данных: нов-назв команды/описание/пример
         sizer_data = wx.BoxSizer(wx.VERTICAL)
         #
-        self.new_name_label = wx.StaticText(self, wx.ID_ANY, "Новое название (если пусто используется старое):", wx.DefaultPosition, wx.DefaultSize, 0)
+        self.new_name_label = wx.StaticText(self, wx.ID_ANY, "Новое название:", wx.DefaultPosition, wx.DefaultSize, 0)
         self.new_name_label.Wrap(-1)
         sizer_data.Add(self.new_name_label, 0, wx.TOP | wx.RIGHT | wx.LEFT, 5)
         # Поле ввода нового названия команды
@@ -293,22 +315,96 @@ class PanelEditCommand(wx.Panel):
 
         # Сайзер кнопок
         sizer_bottom = wx.BoxSizer(wx.VERTICAL)
-
         self.button_apply = wx.Button(self, wx.ID_ANY, "Применить", wx.DefaultPosition, wx.DefaultSize, 0)
         sizer_bottom.Add(self.button_apply, 0, wx.ALIGN_RIGHT | wx.ALL, 5)
         sizer_main_panel_edit_cmd.Add(sizer_bottom, 0, wx.EXPAND, 5)
-        # Привязываем событие для кнопки - "Применить"
+
+        # Скрываем по умолчанию элементы сайзера контекстного меню
+        self.hide_child_elements()
+        # Привязываем событие к выбору модуля
+        self.choice_mod.Bind(wx.EVT_CHOICE, self.on_module_select)
+        # Привязываем событие к выбору команды
+        self.choice_cmd.Bind(wx.EVT_CHOICE, self.on_cmd_select)
+
+        # Привязываем событие для кнопки - "Применить", передаем данные в обработчик
+
         self.button_apply.Bind(wx.EVT_BUTTON, self.on_btn_apply)
 
         self.SetSizer(sizer_main_panel_edit_cmd)
         self.Layout()
         sizer_main_panel_edit_cmd.Fit(self)
 
-    # --------------Обработчики событий --------------
+    # -------------- Обработчики событий --------------
+    def on_module_select(self, event):
+        """Обработчик события выбора модуля"""
+        # Получаем название выбранного модуля
+        selected_module_name = self.choice_mod.GetStringSelection()  # Получаем имя выбранного модуля
+
+        # Очищаем поля от прошлых данных
+        self.new_name_inp_text.Clear()  # Новое название
+        self.descr_inp_text.Clear()  # Описание
+        self.exampl_inp_text.Clear()  # Пример
+
+        # Если модуль выбран загружаем связанные с модулем команды в поле ввода
+        assoc_cmd_mod = database_queries.request_get_commands(selected_module_name)
+        self.choice_cmdChoices = [i['commands_name'] for i in assoc_cmd_mod]
+        # Очищаем поле выбора команд
+        if self.choice_cmd:
+            self.choice_cmd.Clear()
+
+        # Добавляем новые поля
+        for i in self.choice_cmdChoices:
+            self.choice_cmd.Append(i)
+
+    def on_cmd_select(self, event):
+        """Обработчик события выбора команды"""
+        # Получаем название выбранной команды
+        selected_cmd_name = self.choice_cmd.GetStringSelection()
+        # Если команда выбрана загружаем в поля данные о команде
+        cmd_obj = database_queries.show_full_command_info(selected_cmd_name)
+        id_cmd, name_cmd, description, example, mod_assoc = cmd_obj.values()
+        self.new_name_inp_text.SetValue(name_cmd)
+        self.descr_inp_text.SetValue(description)
+        self.exampl_inp_text.SetValue(example)
+        self.Layout()
+
     def on_btn_apply(self, event):
-        """"Изменение команды в БД"""
-        ...
-        # TODO доделать функцию изменения команды
+        """"Изменение команды в БД при нажатии на кнопку Применить"""
+        if self.choice_cmd.GetSelection() != -1:
+            cmd = self.choice_cmd.GetString(self.choice_cmd.GetSelection())  # Нынешнее название
+            name_new = self.new_name_inp_text.GetValue()  # Новое название
+            descr_new = self.descr_inp_text.GetValue()  # Описание
+            example_new = self.exampl_inp_text.GetValue()  # Пример
+            # Изменяем данные команды в БД
+            database_queries.edit_command(cmd=cmd, name_new=name_new, descr_new=descr_new, example_new=example_new)
+            # TODO доделать функцию изменения команды
+
+            # Отображаем диалоговое окно с сообщением
+            message = f"Команда '{cmd}' изменена"
+            wx.MessageBox(message, "Оповещение", wx.OK | wx.ICON_INFORMATION)
+            # Сбрасываем форму
+            self.choice_mod.SetSelection(-1)
+            self.choice_cmd.SetSelection(-1)
+            self.new_name_inp_text.Clear()
+            self.descr_inp_text.Clear()
+            self.exampl_inp_text.Clear()
+
+            event.Skip()
+
+    # -------------- Функции --------------
+    def hide_child_elements(self, elmt_show=None):
+        """Функция скрытия дочерних элементов"""
+        if elmt_show == 'ctx':  # Если это сайзер контекстного меню
+            # Скрываем дочерние элементы в сайзере
+            self.sizer_indiv_edit_cmd.ShowItems(False)
+
+        elif elmt_show == 'indiv':  # Если это сайзер индивидуального изменения команды
+            # Скрываем дочерние элементы в сайзере
+            self.sizer_ctx_edit_cmd.ShowItems(False)
+
+        else:
+            # Если ничего не выбрано, по умолчанию скрываем элементы сайзера self.sizer_ctx_edit_cmd
+            self.sizer_ctx_edit_cmd.ShowItems(False)
 
 
 if __name__ == '__main__':
