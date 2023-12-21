@@ -178,38 +178,31 @@ def edit_command(cmd=None, name_new=None, descr_new=None, example_new=None):
     :param name_new: - имя команды (str)
     :param descr_new: - описание команды (str)
     :param example_new: - пример описания (str)
-    :return: - возвращает булево значение (bool)
+    :return: - возвращает булево значение (bool) или 'error'
     """
     # TODO Доделать функцию изменения команды (логика записи в БД)
-    # Если cmd словарь, значит выполняется изменение команды из контекстного меню
-    if isinstance(cmd, dict):
-        print('Изменяется из контекстного меню')
+    with Session() as session:
+        try:
+            # Ищем команду по имени
+            existing_command = session.query(Command).filter_by(command_name=cmd).first()
 
-    # Если cmd чисто , значит выполняется изменение команды из списка по выбору
-    elif type(cmd) is str:
-        print('Изменяется из списка по выбору')
+            # Проверяем, найдена ли команда
+            if existing_command is not None:
+                # Изменяем название, описание, пример
+                existing_command.command_name = name_new  # Название
+                existing_command.description = descr_new  # Описание
+                existing_command.example = example_new  # Пример
 
-    # with Session() as session:
-    #     try:
-    #         # Ищем команду по имени
-    #         existing_command = session.query(Command).filter_by(command_name=name_new).first()
-    #
-    #         # Проверяем, найдена ли команда
-    #         if existing_command is not None:
-    #             # Изменяем имя и описание
-    #             existing_command.command_name = name_new
-    #             existing_command.description = descr_new
-    #             existing_command.example = example_new
-    #             # Сохраняем изменения в базе данных
-    #             session.commit()
-    #             return True
-    #         else:
-    #             return False
-    #     except Exception as e:
-    #         # Ошибка при изменении команды
-    #         print(f"Ошибка при изменении модуля {name_new}: {e}")
-    #         session.rollback()  # Откатываем изменения в случае ошибки
-    #         return 'error'
+                session.commit()  # Сохраняем изменения в базе данных
+                return True
+            else:
+                return False
+
+        except Exception as e:
+            # Ошибка при изменении команды
+            print(f"Ошибка при изменении команды {cmd}: {e}")
+            session.rollback()  # Откатываем изменения в случае ошибки
+            return 'error'
 
 
 # Функция удаления КОМАНДЫ

@@ -168,39 +168,54 @@ class PanelCenter(wx.Panel):
     # Обработчик для опции "Изменить"
     def edit_cmd(self, command):
         """Функция для редактирования команды из контекстного меню"""
-        edit_dialog = EditCommandOrModule(parent=self)  # Создаем экземпляр класса
+        edit_dialog = EditCommandOrModule(self)  # Создаем экземпляр класса
         edit_dialog.radio_edit_command.SetValue(True)  # Делаем активной радиокнопку - Изменить КОМАНДУ
         edit_dialog.radio_edit_module.SetValue(False)  # Параллельно деактивируем кнопку - Изменить МОДУЛЬ
         edit_dialog.radio_edit_module.Hide()  # Скрываем кнопку - "Изменить МОДУЛЬ"
 
         # Получаем объект окна - изменение команды
         edit_wnd = edit_dialog.GetChildren()[-1]
+
         # Скрываем нужный сайзер в окне, так как команда редактируется из контекстного меню
         edit_wnd.hide_child_elements('ctx')
-        # Заполняем форму данными от команды которую будем изменять
-        edit_wnd.new_name_inp_text.SetValue(command['commands_name'])
-        edit_wnd.descr_inp_text.SetValue(command['description_command'])
-        edit_wnd.exampl_inp_text.SetValue(command['command_example:'])
 
+        # Заполняем форму данными от команды которую будем изменять
+        edit_wnd.cmd_data_name.SetValue(command['commands_name'])  # Название
+        edit_wnd.mod_data_name.SetValue(command['cmd_assoc_module'][0])  # Модуль команды
+        edit_wnd.new_name_inp_text.SetValue(command['commands_name'])  # Новое название команды
+        edit_wnd.descr_inp_text.SetValue(command['description_command'])  # Описание
+        edit_wnd.exampl_inp_text.SetValue(command['command_example:'])  # Пример
+        # TODO не работает изменение команды через контекстное меню
         # Привязываем событие для кнопки "Применить", в созданном объекте(edit_dialog)
-        # Передаем данные в обработчик
-        name_new = edit_wnd.new_name_inp_text.GetValue()  # Название
-        descr_new = edit_wnd.descr_inp_text.GetValue()  # Описание
-        example_new = edit_wnd.exampl_inp_text.GetValue()  # Пример
-        edit_wnd.button_apply.Bind(wx.EVT_BUTTON, lambda event, cmd_data=(command, name_new, descr_new, example_new): self.on_btn_apply(cmd_data))
-        # edit_wnd.Layout()
+        edit_wnd.button_apply.Bind(wx.EVT_BUTTON, lambda event, obj=edit_wnd: self.on_btn_apply(obj))
 
         edit_dialog.ShowModal()  # Отображаем окно
-        edit_dialog.Destroy()
 
     # ----------- Обработчик ----------
-    def on_btn_apply(self, cmd_data):
-        command, name_new, descr_new, example_new = cmd_data
-        database_queries.edit_command(command, name_new, descr_new, example_new)
+    def on_btn_apply(self, obj):
+        """Изменяем данные о команде (через контекстное меню)"""
+        # Получаем данные о команде из полей
+        cmd = obj.cmd_data_name.GetValue()
+        name_new = obj.new_name_inp_text.GetValue()
+        descr_new = obj.descr_inp_text.GetValue()
+        example_new = obj.exampl_inp_text.GetValue()
+        # Изменяем данные команды
+        database_queries.edit_command(cmd=cmd, name_new=name_new, descr_new=descr_new, example_new=example_new)
 
-    # ----------- Функции ----------
-    def update_cmd(self):
-        """Обновление сайзера c перечнем команд"""
+        # Отображаем диалоговое окно с сообщением
+        message = f"Команда '{cmd}' изменена"
+        wx.MessageBox(message, "Оповещение", wx.OK | wx.ICON_INFORMATION)
+
+        # Очищаем поля
+        obj.cmd_data_name.Clear()
+        obj.mod_data_name.Clear()
+        obj.new_name_inp_text.Clear()
+        obj.descr_inp_text.Clear()
+        obj.exampl_inp_text.Clear()
+
+        obj.GetParent().Destroy()  # Закрываем окно (высвобождаем пямять) изменения команды
+        # Обновляем сайзер Data в главном окне приложения
+        self.GetParent().update_main_window(self)
 
 
 ###########################################################################

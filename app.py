@@ -1,5 +1,3 @@
-from time import sleep
-
 import wx
 import wx.xrc
 from dialog_window.search_dialog import SearchDialog
@@ -107,10 +105,18 @@ class FrameMain(wx.Frame):
         # -----------------------------------------------------------
 
         # Сайзер - BOTTOM
-        sizer_bottom = wx.BoxSizer(wx.VERTICAL)
+        sizer_bottom = wx.BoxSizer(wx.HORIZONTAL)
+        # Кнопка - "Обновить сайзер DATA"
+        self.upd_szr_data_button = wx.Button(self, wx.ID_ANY, "Обновить центральную панель", wx.DefaultPosition, wx.DefaultSize, 0)
+        self.upd_szr_data_button.SetFont(wx.Font(12, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
+        sizer_bottom.Add(self.upd_szr_data_button, 0, wx.ALL, 5)
+
+        sizer_bottom.Add((0, 0), 1, wx.EXPAND, 5)  # Разделитель между кнопками
+
+        # Кнопка - "Выход"
         self.close_button = wx.Button(self, wx.ID_ANY, "Выход", wx.DefaultPosition, wx.DefaultSize, 0)
         self.close_button.SetFont(wx.Font(14, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
-        sizer_bottom.Add(self.close_button, 0, wx.ALIGN_RIGHT | wx.ALL, 5)
+        sizer_bottom.Add(self.close_button, 0, wx.ALL, 5)
         sizerMain.Add(sizer_bottom, 0, wx.EXPAND, 5)  # Добавляем в сайзер MAIN сайзер BOTTOM
 
         self.SetSizer(sizerMain)  # Задаём основной сайзер для приложения
@@ -127,7 +133,9 @@ class FrameMain(wx.Frame):
         self.edit_button_data.Bind(wx.EVT_LEFT_DOWN, self.edit_data_button_click)  # Изменить
         self.del_button_data.Bind(wx.EVT_LEFT_DOWN, self.del_data_button_click)  # Удалить
         self.search_button.Bind(wx.EVT_LEFT_DOWN, self.search)  # Поиск
-        self.close_button.Bind(wx.EVT_LEFT_DOWN, self.close_program)  # Закрыть программу
+        self.close_button.Bind(wx.EVT_BUTTON, self.close_program)  # Закрыть программу
+        self.upd_szr_data_button.Bind(wx.EVT_BUTTON, self.update_main_window)  # Обновить данные в сайзере DATA
+        # Обновить центральный сайзер ()
 
     # ---------------- Обработчики события---------------
     def add_data_button_click(self, event):
@@ -167,7 +175,7 @@ class FrameMain(wx.Frame):
         dialog.Destroy()
 
     def close_program(self, event):
-        """Закрытие программы"""
+        """Закрытие программы кнопка - Выход"""
         self.Destroy()
 
     def add_cmd_mod_data(self):
@@ -176,30 +184,27 @@ class FrameMain(wx.Frame):
         dialog.ShowModal()
         dialog.Destroy()
 
-    # ---------------- Функции ----------------
-    def update_main_window(self):
+    def update_main_window(self, event):
         """Обновление сайзера sizer_data главного окна"""
-        # TODO Временно отключаем функцию обновления сайзера
-        # # Получаем текущий сайзер sizer_data
-        # sizer_data = self.GetSizer().GetItem(1).GetSizer()
-        # print(f'текущий сайзер {sizer_data}')
-        #
-        # # Замораживаем обновление экрана
-        # self.Freeze()
-        #
-        # # Уничтожаем все элементы в текущем сайзере
-        # for item in sizer_data.GetChildren():
-        #     item.GetWindow().Destroy()
-        #
-        # # Создаем новый экземпляр класса PanelCenter
-        # new_panel_center = PanelCenter(self)
-        # # Добавляем новый экземпляр в сайзер sizer_data
-        # sizer_data.Add(new_panel_center, 1, wx.EXPAND, 5)
-        #
-        # # Обновляем отображение
-        # self.Layout()
-        # self.Thaw()
-        # self.Refresh()
+        # Получаем текущий сайзер sizer_data
+        sizer_data = self.GetSizer().GetItem(1).GetSizer()
+
+        # Замораживаем обновление экрана
+        self.Freeze()
+
+        # Уничтожаем все элементы в текущем сайзере
+        for item in sizer_data.GetChildren():
+            item.GetWindow().Destroy()
+
+        # Создаем новый экземпляр класса PanelCenter
+        new_panel_center = PanelCenter(self)
+        # Добавляем новый экземпляр в сайзер sizer_data
+        sizer_data.Add(new_panel_center, 1, wx.EXPAND, 5)
+
+        # Обновляем отображение
+        self.Layout()
+        self.Thaw()
+        self.Refresh()
 
 
 if __name__ == '__main__':

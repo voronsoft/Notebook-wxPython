@@ -13,7 +13,7 @@ class EditCommandOrModule(wx.Dialog):
     def __init__(self, parent):
         wx.Dialog.__init__(self, parent, id=wx.ID_ANY, title="Изменить данные", pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.DEFAULT_DIALOG_STYLE)
 
-        self.parent_dialog = parent  # Родитель окна
+        self.parent_dialog = self.GetParent()  # Родитель окна
 
         self.SetSizeHints(wx.DefaultSize, wx.DefaultSize)
         self.SetFont(wx.Font(10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
@@ -90,17 +90,16 @@ class EditCommandOrModule(wx.Dialog):
         message = f"После закрытия окна основной интерфейс будет обновлен."
         wx.MessageBox(message, "Оповещение", wx.OK | wx.ICON_INFORMATION)
 
-        # Вызываем стандартное событие закрытия окна
-        self.Destroy()
-        event.Skip()
-
-        main_obj = self.parent_dialog  # Получаем объект главного окна приложения
         # Обновляем данные в главном окне
-        if main_obj.Parent is None:
-            main_obj.update_main_window()
+        if self.GetParent().GetParent() is None:
+            main_obj = self.GetParent()  # Родитель окна
+            main_obj.update_main_window(None)
+            self.Destroy()  # Закрываем только текущее окно
         else:
-            x = main_obj.Parent
-            x.update_main_window()
+            main_obj = self.parent_dialog.GetParent()
+            print('====NOT none====', main_obj)
+            main_obj.update_main_window(self)
+            event.Veto()
 
 
 ###########################################################################
@@ -245,11 +244,11 @@ class PanelEditCommand(wx.Panel):
         self.module_name_label = wx.StaticText(self, wx.ID_ANY, "Модуль:", wx.DefaultPosition, wx.Size(250, -1), wx.ALIGN_CENTER_HORIZONTAL)
         self.module_name_label.Wrap(-1)
         self.sizer_ctx_edit_cmd.Add(self.module_name_label, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 5)
-        # Поле команды
-        self.cmd_data_name = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size(250, -1), 0 | wx.BORDER_SIMPLE)
+        # Поле "Команда:"
+        self.cmd_data_name = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size(250, -1), wx.TE_READONLY | wx.BORDER_SIMPLE)
         self.cmd_data_name.SetMaxSize(wx.Size(300, -1))
         self.sizer_ctx_edit_cmd.Add(self.cmd_data_name, 0, wx.BOTTOM | wx.EXPAND | wx.LEFT | wx.RIGHT, 5)
-        # Поле модуля связанного с командой
+        # Поле "Модуль:" связанного с командой
         self.mod_data_name = wx.TextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size(250, -1), wx.TE_READONLY | wx.BORDER_SIMPLE)
         self.mod_data_name.SetMaxSize(wx.Size(300, -1))
         self.sizer_ctx_edit_cmd.Add(self.mod_data_name, 0, wx.BOTTOM | wx.EXPAND | wx.LEFT | wx.RIGHT, 5)
@@ -395,13 +394,11 @@ class PanelEditCommand(wx.Panel):
     def hide_child_elements(self, elmt_show=None):
         """Функция скрытия дочерних элементов"""
         if elmt_show == 'ctx':  # Если это сайзер контекстного меню
-            # Скрываем дочерние элементы в сайзере
-            self.sizer_indiv_edit_cmd.ShowItems(False)
+            self.sizer_indiv_edit_cmd.ShowItems(False)  # Скрываем дочерние элементы в сайзере индивидуальное изменение
+            self.sizer_ctx_edit_cmd.ShowItems(True)  # Отображаем доч элем сайзера измен для контекстного меню
 
         elif elmt_show == 'indiv':  # Если это сайзер индивидуального изменения команды
-            # Скрываем дочерние элементы в сайзере
-            self.sizer_ctx_edit_cmd.ShowItems(False)
-
+            self.sizer_ctx_edit_cmd.ShowItems(False)  # Скрываем дочерние элементы в сайзере
         else:
             # Если ничего не выбрано, по умолчанию скрываем элементы сайзера self.sizer_ctx_edit_cmd
             self.sizer_ctx_edit_cmd.ShowItems(False)

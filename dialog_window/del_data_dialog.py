@@ -15,7 +15,7 @@ class DelCmdOrMod(wx.Dialog):
     def __init__(self, parent):
         wx.Dialog.__init__(self, parent, id=wx.ID_ANY, title="Удалить данные", pos=wx.DefaultPosition, size=wx.Size(600, 600), style=wx.DEFAULT_DIALOG_STYLE)
 
-        self.parent_dialog = parent  # Родитель окна
+        self.parent_dialog = self.GetParent()  # Родитель окна
 
         self.SetSizeHints(wx.DefaultSize, wx.DefaultSize)
         self.SetFont(wx.Font(10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
@@ -104,7 +104,7 @@ class DelCmdOrMod(wx.Dialog):
         main_obj = self.parent_dialog
         print(f'родитель======== {main_obj}')
         # Обновляем данные в главном окне
-        main_obj.update_main_window()
+        main_obj.update_main_window(self)
 
 
 ###########################################################################
@@ -116,7 +116,7 @@ class PanelDelModule(wx.Panel):
     def __init__(self, parent, id=wx.ID_ANY, pos=wx.DefaultPosition, size=wx.Size(-1, -1), style=wx.TAB_TRAVERSAL, name="Удалить МОДУЛЬ"):
         wx.Panel.__init__(self, parent, id=id, pos=pos, size=size, style=style, name=name)
 
-        self.parent_dialog = parent  # Родитель окна
+        self.parent_dialog = self.GetParent()  # Родитель окна
 
         # Главный сайзер окна
         sizer_main_panel_del_mod = wx.BoxSizer(wx.VERTICAL)
@@ -216,7 +216,7 @@ class PanelDelCommand(wx.Panel):
     def __init__(self, parent, id=wx.ID_ANY, pos=wx.DefaultPosition, size=wx.Size(-1, -1), style=wx.TAB_TRAVERSAL, name=wx.EmptyString):
         wx.Panel.__init__(self, parent, id=id, pos=pos, size=size, style=style, name=name)
 
-        self.parent_dialog = parent  # Родитель окна
+        self.parent_dialog = self.GetParent()  # Родитель окна
 
         # Главный сайзер окна
         sizer_main_panel_del_cmd = wx.BoxSizer(wx.VERTICAL)
