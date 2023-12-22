@@ -185,7 +185,7 @@ class PanelCenter(wx.Panel):
         edit_wnd.new_name_inp_text.SetValue(command['commands_name'])  # Новое название команды
         edit_wnd.descr_inp_text.SetValue(command['description_command'])  # Описание
         edit_wnd.exampl_inp_text.SetValue(command['command_example:'])  # Пример
-        # TODO не работает изменение команды через контекстное меню
+
         # Привязываем событие для кнопки "Применить", в созданном объекте(edit_dialog)
         edit_wnd.button_apply.Bind(wx.EVT_BUTTON, lambda event, obj=edit_wnd: self.on_btn_apply(obj))
 

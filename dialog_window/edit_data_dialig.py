@@ -376,7 +376,6 @@ class PanelEditCommand(wx.Panel):
             example_new = self.exampl_inp_text.GetValue()  # Пример
             # Изменяем данные команды в БД
             database_queries.edit_command(cmd=cmd, name_new=name_new, descr_new=descr_new, example_new=example_new)
-            # TODO доделать функцию изменения команды
 
             # Отображаем диалоговое окно с сообщением
             message = f"Команда '{cmd}' изменена"

@@ -180,7 +180,6 @@ def edit_command(cmd=None, name_new=None, descr_new=None, example_new=None):
     :param example_new: - пример описания (str)
     :return: - возвращает булево значение (bool) или 'error'
     """
-    # TODO Доделать функцию изменения команды (логика записи в БД)
     with Session() as session:
         try:
             # Ищем команду по имени

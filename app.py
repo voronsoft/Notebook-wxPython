@@ -4,11 +4,11 @@ from dialog_window.search_dialog import SearchDialog
 from dialog_window.del_data_dialog import DelCmdOrMod
 from dialog_window.panel_center_dialog import PanelCenter
 from dialog_window.about_program_dialog import AboutProgram
+from dialog_window.statistics_dialog import StatisticDialog
 from dialog_window.add_data_dialog import AddCommandOrModule
 from dialog_window.edit_data_dialig import EditCommandOrModule
 
 
-# TODO !!! Пересмотреть принцип перерисовки интерфейса если был удален модуль или команда !!!
 # Часть кода - строка 181 (def update_main_window(self):)
 ###########################################################################
 # Class FrameMain
@@ -57,7 +57,12 @@ class FrameMain(wx.Frame):
         exit_menu_item = file_menu.Append(wx.ID_EXIT, "Выход", "Закрыть программу")
         self.Bind(wx.EVT_MENU, self.close_program, exit_menu_item)
         menu_bar.Append(file_menu, "Файл")
-        # Меню "Справка"
+        # Меню "Статистика"
+        help_menu = wx.Menu()
+        stat_menu_item = help_menu.Append(wx.ID_ANY, "Статистика", "Данные статистики по модулям и командам")
+        self.Bind(wx.EVT_MENU, self.atatistics_show, stat_menu_item)
+        menu_bar.Append(help_menu, "Статистика")
+        # Меню "Help"
         help_menu = wx.Menu()
         documentation_menu_item = help_menu.Append(wx.ID_ANY, "Документация", "Открыть документацию")
         about_menu_item = help_menu.Append(wx.ID_ANY, "About (о программе)", "About (о программе)")
@@ -167,6 +172,12 @@ class FrameMain(wx.Frame):
     def show_documentation(self, event):
         """Открытие диалога документации"""
         pass
+
+    def atatistics_show(self, event):
+        """Отображение статистики о модулях и количестве команд"""
+        dialog = StatisticDialog(self)
+        dialog.ShowModal()
+        dialog.Destroy()
 
     def about_info(self, event):
         """Отображение информации о программе"""
