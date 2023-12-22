@@ -14,6 +14,8 @@ class AddCommandOrModule(wx.Dialog):
     def __init__(self, parent):
         wx.Dialog.__init__(self, parent, id=wx.ID_ANY, title="Добавить данные", pos=wx.DefaultPosition, size=wx.Size(600, 600), style=wx.DEFAULT_DIALOG_STYLE)
 
+        self.parent_dialog = self.GetParent()  # Родитель окна
+
         self.SetSizeHints(wx.DefaultSize, wx.DefaultSize)
         self.SetFont(wx.Font(10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
         # Главный сайзер окна
@@ -84,7 +86,18 @@ class AddCommandOrModule(wx.Dialog):
     # Обработчик события закрытия окна
     def on_close_dialog(self, event):
         """Закрытие диалогового окна"""
+        # Отображаем диалоговое окно с сообщением
+        message = f"После закрытия окна основной интерфейс будет обновлен\nс учетом добавленных данных."
+        wx.MessageBox(message, "Оповещение", wx.OK | wx.ICON_INFORMATION)
+
+        # Вызываем стандартное событие закрытия окна
         self.Destroy()
+        event.Skip()
+
+        # Получаем объект главного окна приложения
+        main_obj = self.parent_dialog
+        # Обновляем данные в главном окне
+        main_obj.update_main_window(self)
 
 
 ###########################################################################
