@@ -2,11 +2,10 @@ import os
 from db.models import Module, Command
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine, func
+from instance import app_config
 
-# Получаем корневую директорию проекта
-root_directory = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Строим путь к файлу базы данных
-path_to_DB = os.path.join(root_directory, 'db', 'db_notebook.db')  # Путь к БД относительно вызова функции
+path_to_DB = os.path.join(app_config.root_directory, 'db', 'db_notebook.db')  # Путь к БД относительно вызова функции
 
 engine = create_engine(f'sqlite:///{path_to_DB}', echo=True)  # Создаем соединение с базой данных
 Session = sessionmaker(bind=engine)  # Создаем сессию для взаимодействия с базой данных

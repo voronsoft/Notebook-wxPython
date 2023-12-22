@@ -1,5 +1,8 @@
+import os
+
 import wx
 import wx.xrc
+from instance.app_config import icons_folder_path
 from dialog_window.search_dialog import SearchDialog
 from dialog_window.del_data_dialog import DelCmdOrMod
 from dialog_window.panel_center_dialog import PanelCenter
@@ -9,7 +12,6 @@ from dialog_window.add_data_dialog import AddCommandOrModule
 from dialog_window.edit_data_dialig import EditCommandOrModule
 
 
-# Часть кода - строка 181 (def update_main_window(self):)
 ###########################################################################
 # Class FrameMain
 ###########################################################################
@@ -54,20 +56,39 @@ class FrameMain(wx.Frame):
         file_menu = wx.Menu()
         add_data_menu_item = file_menu.Append(wx.ID_ANY, "Добавить данные", "Добавить Команду или Модуль")
         self.Bind(wx.EVT_MENU, self.add_data_button_click, add_data_menu_item)
+        # Загружаем иконку и связываем с пунктом
+        icon_add = wx.Bitmap(os.path.join(icons_folder_path, "add16.png"), wx.BITMAP_TYPE_PNG)
+        add_data_menu_item.SetBitmap(icon_add)
         exit_menu_item = file_menu.Append(wx.ID_EXIT, "Выход", "Закрыть программу")
         self.Bind(wx.EVT_MENU, self.close_program, exit_menu_item)
+        # Загружаем иконку и связываем с пунктом
+        icon_exit = wx.Bitmap(os.path.join(icons_folder_path, "exit16.png"), wx.BITMAP_TYPE_PNG)
+        exit_menu_item.SetBitmap(icon_exit)
         menu_bar.Append(file_menu, "Файл")
+
         # Меню "Статистика"
-        help_menu = wx.Menu()
-        stat_menu_item = help_menu.Append(wx.ID_ANY, "Статистика", "Данные статистики по модулям и командам")
-        self.Bind(wx.EVT_MENU, self.atatistics_show, stat_menu_item)
-        menu_bar.Append(help_menu, "Статистика")
+        stat_menu = wx.Menu()
+        stat_menu_item = stat_menu.Append(wx.ID_ANY, "Статистика", "Данные статистики по модулям и командам")
+        self.Bind(wx.EVT_MENU, self.statistics_show, stat_menu_item)
+        # Загружаем иконку и связываем с пунктом
+        icon_stat = wx.Bitmap(os.path.join(icons_folder_path, "stat16.png"), wx.BITMAP_TYPE_PNG)
+        stat_menu_item.SetBitmap(icon_stat)
+        menu_bar.Append(stat_menu, "Статистика")
+
         # Меню "Help"
         help_menu = wx.Menu()
         documentation_menu_item = help_menu.Append(wx.ID_ANY, "Документация", "Открыть документацию")
-        about_menu_item = help_menu.Append(wx.ID_ANY, "About (о программе)", "About (о программе)")
         self.Bind(wx.EVT_MENU, self.show_documentation, documentation_menu_item)
+        # Загружаем иконку и связываем с пунктом
+        icon_documentation = wx.Bitmap(os.path.join(icons_folder_path, "documentation16.png"), wx.BITMAP_TYPE_PNG)
+        documentation_menu_item.SetBitmap(icon_documentation)
+
+        about_menu_item = help_menu.Append(wx.ID_ANY, "About (о программе)", "About (о программе)")
         self.Bind(wx.EVT_MENU, self.about_info, about_menu_item)
+        # Загружаем иконку и связываем с пунктом
+        icon_about = wx.Bitmap(os.path.join(icons_folder_path, "about16.png"), wx.BITMAP_TYPE_PNG)
+        about_menu_item.SetBitmap(icon_about)
+
         menu_bar.Append(help_menu, "Help")
 
         self.SetMenuBar(menu_bar)  # Устанавливаем созданное меню
@@ -76,27 +97,31 @@ class FrameMain(wx.Frame):
         sizerMain = wx.BoxSizer(wx.VERTICAL)
         sizerMain.SetMinSize(wx.Size(600, 600))
 
-        # Сайзер - TOP
+        # Сайзер - TOP (кнопки)
         sizer_top_button = wx.BoxSizer(wx.HORIZONTAL)
         sizer_top_button.SetMinSize(wx.Size(600, 50))
         # Кнопка - "Добавить"
         self.add_button_data = wx.Button(self, wx.ID_ANY, "Добавить", wx.DefaultPosition, wx.DefaultSize, 0)
         self.add_button_data.SetLabelMarkup("Добавить")
+        self.add_button_data.SetBitmap(wx.Bitmap(os.path.join(icons_folder_path, "add24.png"), wx.BITMAP_TYPE_ANY))
         self.add_button_data.SetFont(wx.Font(14, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
         sizer_top_button.Add(self.add_button_data, 1, wx.ALL | wx.EXPAND, 5)
         # Кнопка - "Изменить"
         self.edit_button_data = wx.Button(self, wx.ID_ANY, "Изменить", wx.DefaultPosition, wx.DefaultSize, 0)
         self.edit_button_data.SetLabelMarkup("Изменить")
+        self.edit_button_data.SetBitmap(wx.Bitmap(os.path.join(icons_folder_path, "edit24.png"), wx.BITMAP_TYPE_ANY))
         self.edit_button_data.SetFont(wx.Font(14, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
         sizer_top_button.Add(self.edit_button_data, 1, wx.ALL | wx.EXPAND, 5)
         # Кнопка - "Удалить"
         self.del_button_data = wx.Button(self, wx.ID_ANY, "Удалить", wx.DefaultPosition, wx.DefaultSize, 0)
         self.del_button_data.SetLabelMarkup("Удалить")
+        self.del_button_data.SetBitmap(wx.Bitmap(os.path.join(icons_folder_path, "del24.png"), wx.BITMAP_TYPE_ANY))
         self.del_button_data.SetFont(wx.Font(14, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
         sizer_top_button.Add(self.del_button_data, 1, wx.ALL | wx.EXPAND, 5)
         # Кнопка - "Поиск"
         self.search_button = wx.Button(self, wx.ID_ANY, "Поиск", wx.DefaultPosition, wx.DefaultSize, 0)
         self.search_button.SetLabelMarkup("Поиск")
+        self.search_button.SetBitmap(wx.Bitmap(os.path.join(icons_folder_path, "search24.png"), wx.BITMAP_TYPE_ANY))
         self.search_button.SetFont(wx.Font(14, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
         sizer_top_button.Add(self.search_button, 1, wx.ALL | wx.EXPAND, 5)
         sizerMain.Add(sizer_top_button, 0, wx.EXPAND, 5)  # Добавляем сайзер TOP в главный сайзер MAIN
@@ -113,6 +138,7 @@ class FrameMain(wx.Frame):
         sizer_bottom = wx.BoxSizer(wx.HORIZONTAL)
         # Кнопка - "Обновить сайзер DATA"
         self.upd_szr_data_button = wx.Button(self, wx.ID_ANY, "Обновить центральную панель", wx.DefaultPosition, wx.DefaultSize, 0)
+        self.upd_szr_data_button.SetBitmap(wx.Bitmap(os.path.join(icons_folder_path, "updt16.png"), wx.BITMAP_TYPE_ANY))
         self.upd_szr_data_button.SetFont(wx.Font(12, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
         sizer_bottom.Add(self.upd_szr_data_button, 0, wx.ALL, 5)
 
@@ -120,6 +146,7 @@ class FrameMain(wx.Frame):
 
         # Кнопка - "Выход"
         self.close_button = wx.Button(self, wx.ID_ANY, "Выход", wx.DefaultPosition, wx.DefaultSize, 0)
+        self.close_button.SetBitmap(wx.Bitmap(os.path.join(icons_folder_path, "exit24.png"), wx.BITMAP_TYPE_ANY))
         self.close_button.SetFont(wx.Font(14, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
         sizer_bottom.Add(self.close_button, 0, wx.ALL, 5)
         sizerMain.Add(sizer_bottom, 0, wx.EXPAND, 5)  # Добавляем в сайзер MAIN сайзер BOTTOM
@@ -173,7 +200,7 @@ class FrameMain(wx.Frame):
         """Открытие диалога документации"""
         pass
 
-    def atatistics_show(self, event):
+    def statistics_show(self, event):
         """Отображение статистики о модулях и количестве команд"""
         dialog = StatisticDialog(self)
         dialog.ShowModal()
