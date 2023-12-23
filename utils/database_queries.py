@@ -1,11 +1,10 @@
-import os
 from db.models import Module, Command
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import create_engine, func
-from instance import app_config
+from sqlalchemy import create_engine, func, inspect, text
+from instance.app_config import path_to_DB
 
-# Строим путь к файлу базы данных
-path_to_DB = os.path.join(app_config.root_directory, 'db', 'db_notebook.db')  # Путь к БД относительно вызова функции
+# # Строим путь к файлу базы данных
+# path_to_DB = os.path.join(app_config.root_directory, 'db', 'db_notebook.db')  # Путь к БД относительно вызова функции
 
 engine = create_engine(f'sqlite:///{path_to_DB}', echo=True)  # Создаем соединение с базой данных
 Session = sessionmaker(bind=engine)  # Создаем сессию для взаимодействия с базой данных
@@ -313,5 +312,33 @@ def del_module(name_mod):
         except Exception as e:
             # Ошибка при удалении из БД данных о модуле или командах
             print(f"Ошибка при удалении модуля {name_mod}: {e}")
+            session.rollback()  # Откатываем изменения в случае ошибки
+            return 'error'
+
+
+# Функция очистки базы данных
+def clear_database():
+    """Функция удаления всех данных из таблиц в базе данных"""
+    with Session() as session:
+        try:
+            # Получаем инспектора для анализа структуры базы данных
+            inspector = inspect(engine)
+
+            # Получаем список всех таблиц в базе данных
+            tables = inspector.get_table_names()
+
+            # Очищаем каждую таблицу
+            for table in tables:
+                delete_query = text(f"DELETE FROM {table}")
+                session.execute(delete_query)
+
+            # Фиксируем изменения
+            session.commit()
+
+            print("База данных успешно очищена.")
+
+        except Exception as e:
+            # Ошибка при удалении данных
+            print(f"Ошибка при удалении данных из БД: {e}")
             session.rollback()  # Откатываем изменения в случае ошибки
             return 'error'

@@ -1,5 +1,4 @@
 import os
-
 import wx
 import wx.xrc
 from instance.app_config import icons_folder_path
@@ -10,6 +9,7 @@ from dialog_window.about_program_dialog import AboutProgram
 from dialog_window.statistics_dialog import StatisticDialog
 from dialog_window.add_data_dialog import AddCommandOrModule
 from dialog_window.edit_data_dialig import EditCommandOrModule
+from dialog_window.documentation_dialog import DocumentationDialog
 
 
 ###########################################################################
@@ -52,10 +52,11 @@ class FrameMain(wx.Frame):
 
         # Создаем системное меню
         menu_bar = wx.MenuBar()
+
         # Меню "Файл"
         file_menu = wx.Menu()
         add_data_menu_item = file_menu.Append(wx.ID_ANY, "Добавить данные", "Добавить Команду или Модуль")
-        self.Bind(wx.EVT_MENU, self.add_data_button_click, add_data_menu_item)
+        self.Bind(wx.EVT_MENU, self.add_cmd_mod_data, add_data_menu_item)
         # Загружаем иконку и связываем с пунктом
         icon_add = wx.Bitmap(os.path.join(icons_folder_path, "add16.png"), wx.BITMAP_TYPE_PNG)
         add_data_menu_item.SetBitmap(icon_add)
@@ -88,7 +89,6 @@ class FrameMain(wx.Frame):
         # Загружаем иконку и связываем с пунктом
         icon_about = wx.Bitmap(os.path.join(icons_folder_path, "about16.png"), wx.BITMAP_TYPE_PNG)
         about_menu_item.SetBitmap(icon_about)
-
         menu_bar.Append(help_menu, "Help")
 
         self.SetMenuBar(menu_bar)  # Устанавливаем созданное меню
@@ -169,7 +169,7 @@ class FrameMain(wx.Frame):
         self.upd_szr_data_button.Bind(wx.EVT_BUTTON, self.update_main_window)  # Обновить данные в сайзере DATA
         # Обновить центральный сайзер ()
 
-    # ---------------- Обработчики события---------------
+    # ---------------- Обработчики событий---------------
     def add_data_button_click(self, event):
         """Открытие диалога добавить данные о команде или модуле"""
         add_dialog = AddCommandOrModule(self)
@@ -198,7 +198,8 @@ class FrameMain(wx.Frame):
     # ----------------  Обработчики событий для пунктов системного меню ----------------
     def show_documentation(self, event):
         """Открытие диалога документации"""
-        pass
+        dialog_doc = DocumentationDialog(self)
+        dialog_doc.Show()
 
     def statistics_show(self, event):
         """Отображение статистики о модулях и количестве команд"""
@@ -216,11 +217,13 @@ class FrameMain(wx.Frame):
         """Закрытие программы кнопка - Выход"""
         self.Destroy()
 
-    def add_cmd_mod_data(self):
+    def add_cmd_mod_data(self, event):
         """Открытие диалога для добавления данных в программу"""
         dialog = AddCommandOrModule(self)
         dialog.ShowModal()
         dialog.Destroy()
+
+    # ------------------------------------- END ----------------------------------------
 
     def update_main_window(self, event):
         """Обновление сайзера sizer_data главного окна"""

@@ -1,14 +1,14 @@
 """Файл для создания БД db-notebook (sqlite3)"""
-
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from models import Base, Module, Command, CommandModuleAssociation
+from instance.app_config import path_to_DB
+from db.models import Base, Module, Command, CommandModuleAssociation
 
 
 def create_database():
     """Создание базы данных"""
     # Создаем соединение с базой данных
-    engine = create_engine('sqlite:///db_notebook.db', echo=True)
+    engine = create_engine(f'sqlite:///{path_to_DB}', echo=True)
     # Создаем сессию для взаимодействия с базой данных
     Session = sessionmaker(bind=engine)
     with Session() as session:
@@ -55,7 +55,7 @@ def added_command_data_db(path_file_data=None):
     data_list = list(*data_temp[1:])  # Список команд
 
     # Создаем соединение с базой данных
-    engine = create_engine('sqlite:///db_notebook.db', echo=True)
+    engine = create_engine(f'sqlite:///{path_to_DB}', echo=True)
     # Создаем сессию для взаимодействия с базой данных
     Session = sessionmaker(bind=engine)
 
@@ -119,15 +119,16 @@ def added_command_data_db(path_file_data=None):
             print("Не указано название модуля в файле !")
 
 
-# Создаем БД
-create_database()
-# Добавляем команды к модулям
-# ВАЖНО !! Первая строка в файлах с командами указывает на принадлежность к модулю
-# Остальные строки это команды
-added_command_data_db('data_add_db/list_data_add_db.txt')  # list
-added_command_data_db('data_add_db/string_data_add_db.txt')  # string
-added_command_data_db('data_add_db/dict_data_add_db.txt')  # dict
-added_command_data_db('data_add_db/tuple_data_add_db.txt')  # tuple
-added_command_data_db('data_add_db/set_data_add_db.txt')  # set
-added_command_data_db('data_add_db/python_func_data_add_db.txt')  # function python
-added_command_data_db('data_add_db/class_magic_methods_data_add_db.txt')  # class magic methods  python
+if __name__ == '__main__':
+    # Создаем БД
+    create_database()
+    # Добавляем команды к модулям
+    # ВАЖНО !! Первая строка в файлах с командами указывает на принадлежность к модулю
+    # Остальные строки это команды
+    added_command_data_db('data_add_db/list_data_add_db.txt')  # list
+    added_command_data_db('data_add_db/string_data_add_db.txt')  # string
+    added_command_data_db('data_add_db/dict_data_add_db.txt')  # dict
+    added_command_data_db('data_add_db/tuple_data_add_db.txt')  # tuple
+    added_command_data_db('data_add_db/set_data_add_db.txt')  # set
+    added_command_data_db('data_add_db/python_func_data_add_db.txt')  # function python
+    added_command_data_db('data_add_db/class_magic_methods_data_add_db.txt')  # class magic methods  python
