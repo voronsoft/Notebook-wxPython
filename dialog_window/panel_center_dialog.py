@@ -26,18 +26,28 @@ class PanelCenter(wx.Panel):
 
         # TODO если удалить все модули то приложение не запускается из за ошибки в строке 31
         # ######### Загружаем данные для первой вкладки при запуске главной страницы (что-бы страница не была пустой)
-        # Если вкладка пустая (без команд)
-        if self.list_tabs_mod[0].scrol_wind.GetSizer().GetItemCount() == 0:
+        # Если есть хоть одна вкладка (модуль) и она пустая (без команд), загружаем команды
+        if len(self.list_tabs_mod) > 0 and self.list_tabs_mod[0].scrol_wind.GetSizer().GetItemCount() == 0:
             first_tab = self.list_tabs_mod[0]
             # Запускаем загрузку команд для активной вкладки
             name_first_tb = self.notebook.GetPageText(0)
             self.add_cmd_to_tab(first_tab, name_first_tb)
+        else:
+            wx.CallAfter(self.if_not_module)
 
         # Привязываем событие выбора вкладки
         self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.on_page_changed, self.notebook)
 
         self.SetSizer(sizer_main_panel)
         self.Layout()
+
+    # Обработчики
+    def if_not_module(self):
+        """Функция заполнения основной страницы (если в БД нет данных)"""
+        # Оповещение
+        message = (f"База данных пустая.\n"
+                   f"Необходимо заполнить базу данных")
+        wx.MessageBox(message, "Сообщение", wx.OK | wx.ICON_INFORMATION)
 
     def add_tabs(self):
         """Функция для добавления вкладок в notebook"""
@@ -124,7 +134,6 @@ class PanelCenter(wx.Panel):
         self.Thaw()  # Размораживаем обновление окна (убираем мерцание экрана при обновлении)
         tab.Layout()  # Обновляем расположение элементов в вкладке
 
-    # Обработчики
     def show_command_details(self, command):
         """Функция открытия диалога для просмотра подробной информации о команде (для контекстного меню)"""
         dialog = ViewCommandData(self)  # Создаем экземпляр класса

@@ -119,16 +119,15 @@ def added_command_data_db(path_file_data=None):
             print("Не указано название модуля в файле !")
 
 
-if __name__ == "__main__":
-    # Создаем БД
-    create_database()
-    # Добавляем команды к модулям
-    # ВАЖНО !! Первая строка в файлах с командами указывает на принадлежность к модулю
-    # Остальные строки это команды
-    added_command_data_db('data_add_db/list_data_add_db.txt')  # list
-    added_command_data_db('data_add_db/string_data_add_db.txt')  # string
-    added_command_data_db('data_add_db/dict_data_add_db.txt')  # dict
-    added_command_data_db('data_add_db/tuple_data_add_db.txt')  # tuple
-    added_command_data_db('data_add_db/set_data_add_db.txt')  # set
-    added_command_data_db('data_add_db/python_func_data_add_db.txt')  # function python
-    added_command_data_db('data_add_db/class_magic_methods_data_add_db.txt')  # class magic methods  python
+# Создаем БД
+create_database()
+# Добавляем команды к модулям
+# ВАЖНО !! Первая строка в файлах с командами указывает на принадлежность к модулю
+# Остальные строки это команды
+added_command_data_db('data_add_db/list_data_add_db.txt')  # list
+added_command_data_db('data_add_db/string_data_add_db.txt')  # string
+added_command_data_db('data_add_db/dict_data_add_db.txt')  # dict
+added_command_data_db('data_add_db/tuple_data_add_db.txt')  # tuple
+added_command_data_db('data_add_db/set_data_add_db.txt')  # set
+added_command_data_db('data_add_db/python_func_data_add_db.txt')  # function python
+added_command_data_db('data_add_db/class_magic_methods_data_add_db.txt')  # class magic methods  python
