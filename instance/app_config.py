@@ -6,6 +6,9 @@ root_directory = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Путь к иконкам
 icons_folder_path = os.path.join(root_directory, "icons")
 
+# Путь к изображениям для HTML
+img_folder_path = os.path.join(root_directory, 'html', 'img')
+
 # Путь к файлу с восстановлением БД в исходное состояние
 upd_db_folder_path = os.path.join(root_directory, "db", "data_add_db")
 

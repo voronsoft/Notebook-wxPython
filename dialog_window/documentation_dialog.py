@@ -1,21 +1,21 @@
 import os
 import wx
 import wx.xrc
-import wx.html
-from instance.app_config import icons_folder_path, upd_db_folder_path
-from db.creat_db_and_data import create_database, added_command_data_db
+import wx.html2
 from utils.database_queries import clear_database
+from instance.app_config import icons_folder_path, upd_db_folder_path, root_directory
+from db.creat_db_and_data import create_database, added_command_data_db
 
 
 ###########################################################################
 # Class DocumentationDialog
 ###########################################################################
 
-class DocumentationDialog(wx.Frame):
+class DocumentationDialog(wx.Dialog):
     """Документация"""
 
     def __init__(self, parent):
-        wx.Frame.__init__(self, parent, id=wx.ID_ANY, title="Документация", pos=wx.DefaultPosition, size=wx.Size(600, 600), style=wx.DEFAULT_DIALOG_STYLE)
+        wx.Dialog.__init__(self, parent, id=wx.ID_ANY, title="Документация", pos=wx.DefaultPosition, size=wx.Size(600, 600), style=wx.DEFAULT_DIALOG_STYLE)
 
         self.parent_dialog = self.GetParent()  # Родитель окна
 
@@ -38,10 +38,17 @@ class DocumentationDialog(wx.Frame):
         sizer_main.Add(sizer_top, 0, wx.EXPAND, 5)
         # Сайзер DATA
         sizer_data = wx.BoxSizer(wx.VERTICAL)
+        sizer_data.SetMinSize(wx.Size(600, 600))
 
-        self.html_wind = wx.html.HtmlWindow(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.html.HW_SCROLLBAR_AUTO)
-        self.html_wind.SetFont(wx.Font(10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
-        sizer_data.Add(self.html_wind, 0, wx.ALL | wx.EXPAND, 5)
+        # -------------------------- # --------------------------
+        self.html_win = wx.html2.WebView.New(self)
+        self.html_win.SetMinSize(wx.Size(600, 600))
+        # Путь к локальному HTML-файлу
+        local_html_path = os.path.join(root_directory, 'html', 'documentation.html')
+        # Загружаем страницу
+        self.html_win.LoadURL("file://" + local_html_path)
+        sizer_data.Add(self.html_win, 1, wx.ALL, 5)
+        # -------------------------- # --------------------------
 
         sizer_data.Add((0, 0), 1, wx.EXPAND, 5)
 
@@ -97,8 +104,7 @@ class DocumentationDialog(wx.Frame):
         self.parent_dialog.update_main_window(None)
         # Выводим сообщение об восстановлении БД
         # Отображаем диалоговое окно с сообщением
-        msg_upd_db = (f"Интерфейс обновлен."
-                      f"БД в исходном состоянии")
+        msg_upd_db = f"Интерфейс обновлен.\nБД в исходном состоянии"
         wx.MessageBox(msg_upd_db, "Оповещение", wx.OK | wx.ICON_INFORMATION)
 
         event.Skip()
