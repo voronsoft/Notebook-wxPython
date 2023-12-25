@@ -1,7 +1,9 @@
 import os
 import wx
 import wx.xrc
-from instance.app_config import icons_folder_path
+
+from db.creat_db_and_data import create_database, added_command_data_db
+from instance.app_config import icons_folder_path, upd_db_folder_path
 from dialog_window.search_dialog import SearchDialog
 from dialog_window.del_data_dialog import DelCmdOrMod
 from dialog_window.panel_center_dialog import PanelCenter
@@ -10,6 +12,7 @@ from dialog_window.statistics_dialog import StatisticDialog
 from dialog_window.add_data_dialog import AddCommandOrModule
 from dialog_window.edit_data_dialig import EditCommandOrModule
 from dialog_window.documentation_dialog import DocumentationDialog
+from utils.database_queries import clear_database
 
 
 ###########################################################################
@@ -55,11 +58,19 @@ class FrameMain(wx.Frame):
 
         # Меню "Файл"
         file_menu = wx.Menu()
-        add_data_menu_item = file_menu.Append(wx.ID_ANY, "Добавить данные", "Добавить Команду или Модуль")
-        self.Bind(wx.EVT_MENU, self.add_cmd_mod_data, add_data_menu_item)
+        # 1
+        load_bd_python_menu_item = file_menu.Append(wx.ID_ANY, "Загрузить БД Python", "Будет загружена БД для языка PYTHON")
+        self.Bind(wx.EVT_MENU, self.load_bd_python, load_bd_python_menu_item)
         # Загружаем иконку и связываем с пунктом
-        icon_add = wx.Bitmap(os.path.join(icons_folder_path, "add16.png"), wx.BITMAP_TYPE_PNG)
-        add_data_menu_item.SetBitmap(icon_add)
+        icon_updt_db = wx.Bitmap(os.path.join(icons_folder_path, "updt16.png"), wx.BITMAP_TYPE_PNG)
+        load_bd_python_menu_item.SetBitmap(icon_updt_db)
+        # 2
+        cls_bd_menu_item = file_menu.Append(wx.ID_ANY, "Очистить БД", "БД будет стерта")
+        self.Bind(wx.EVT_MENU, self.clear_database, cls_bd_menu_item)
+        # Загружаем иконку и связываем с пунктом
+        icon_del_db = wx.Bitmap(os.path.join(icons_folder_path, "del16.png"), wx.BITMAP_TYPE_PNG)
+        cls_bd_menu_item.SetBitmap(icon_del_db)
+        # 3
         exit_menu_item = file_menu.Append(wx.ID_EXIT, "Выход", "Закрыть программу")
         self.Bind(wx.EVT_MENU, self.close_program, exit_menu_item)
         # Загружаем иконку и связываем с пунктом
@@ -69,6 +80,7 @@ class FrameMain(wx.Frame):
 
         # Меню "Статистика"
         stat_menu = wx.Menu()
+        # 1
         stat_menu_item = stat_menu.Append(wx.ID_ANY, "Статистика", "Данные статистики по модулям и командам")
         self.Bind(wx.EVT_MENU, self.statistics_show, stat_menu_item)
         # Загружаем иконку и связываем с пунктом
@@ -78,12 +90,13 @@ class FrameMain(wx.Frame):
 
         # Меню "Help"
         help_menu = wx.Menu()
+        # 1
         documentation_menu_item = help_menu.Append(wx.ID_ANY, "Документация", "Открыть документацию")
         self.Bind(wx.EVT_MENU, self.show_documentation, documentation_menu_item)
         # Загружаем иконку и связываем с пунктом
         icon_documentation = wx.Bitmap(os.path.join(icons_folder_path, "documentation16.png"), wx.BITMAP_TYPE_PNG)
         documentation_menu_item.SetBitmap(icon_documentation)
-
+        # 2
         about_menu_item = help_menu.Append(wx.ID_ANY, "About (о программе)", "About (о программе)")
         self.Bind(wx.EVT_MENU, self.about_info, about_menu_item)
         # Загружаем иконку и связываем с пунктом
@@ -195,36 +208,6 @@ class FrameMain(wx.Frame):
         search_dialog.ShowModal()
         search_dialog.Destroy()
 
-    # ----------------  Обработчики событий для пунктов системного меню ----------------
-    def show_documentation(self, event):
-        """Открытие диалога документации"""
-        dialog_doc = DocumentationDialog(self)
-        dialog_doc.Show()
-
-    def statistics_show(self, event):
-        """Отображение статистики о модулях и количестве команд"""
-        dialog = StatisticDialog(self)
-        dialog.ShowModal()
-        dialog.Destroy()
-
-    def about_info(self, event):
-        """Отображение информации о программе"""
-        dialog = AboutProgram(self)
-        dialog.ShowModal()
-        dialog.Destroy()
-
-    def close_program(self, event):
-        """Закрытие программы кнопка - Выход"""
-        self.Destroy()
-
-    def add_cmd_mod_data(self, event):
-        """Открытие диалога для добавления данных в программу"""
-        dialog = AddCommandOrModule(self)
-        dialog.ShowModal()
-        dialog.Destroy()
-
-    # ------------------------------------- END ----------------------------------------
-
     def update_main_window(self, event):
         """Обновление сайзера sizer_data главного окна"""
         # Получаем текущий сайзер sizer_data
@@ -246,6 +229,59 @@ class FrameMain(wx.Frame):
         self.Layout()
         self.Thaw()
         self.Refresh()
+
+    # ----------------  Обработчики событий для пунктов системного меню ----------------
+    def show_documentation(self, event):
+        """Открытие диалога документации"""
+        dialog_doc = DocumentationDialog(self)
+        # dialog_doc.Show()  # Откроет окно как независимую единицу
+        dialog_doc.ShowModal()
+        dialog_doc.Destroy()
+
+    def statistics_show(self, event):
+        """Отображение статистики о модулях и количестве команд"""
+        dialog = StatisticDialog(self)
+        dialog.ShowModal()
+        dialog.Destroy()
+
+    def about_info(self, event):
+        """Отображение информации о программе"""
+        dialog = AboutProgram(self)
+        dialog.ShowModal()
+        dialog.Destroy()
+
+    def close_program(self, event):
+        """Закрытие программы кнопка - Выход"""
+        self.Destroy()
+
+    def load_bd_python(self, event):
+        """Загрузка БД для Python"""
+        clear_database()  # Очищаем БД
+        create_database()  # Создаем БД
+
+        info_add = wx.BusyInfo("Создаются вкладки, добавляются команды...")
+        # Добавляем модули и команды в БД
+        added_command_data_db(os.path.join(upd_db_folder_path, "list_data_add_db.txt"))  # list
+        added_command_data_db(os.path.join(upd_db_folder_path, "string_data_add_db.txt"))  # string
+        added_command_data_db(os.path.join(upd_db_folder_path, 'dict_data_add_db.txt'))  # dict
+        added_command_data_db(os.path.join(upd_db_folder_path, 'tuple_data_add_db.txt'))  # tuple
+        added_command_data_db(os.path.join(upd_db_folder_path, 'set_data_add_db.txt'))  # set
+        added_command_data_db(os.path.join(upd_db_folder_path, 'python_func_data_add_db.txt'))  # function python
+        added_command_data_db(os.path.join(upd_db_folder_path, 'class_magic_methods_data_add_db.txt'))  # class magic methods  python
+        del info_add
+
+        info_upd = wx.BusyInfo("Обновляем интерфейс...")
+        self.update_main_window(None)  # Обновляем интерфейс
+        del info_upd
+
+    def clear_database(self, event):
+        """Очистить БД"""
+        info = wx.BusyInfo("Удаляем БД, обновляем интерфейс...")
+        clear_database()  # Очищаем БД
+        self.update_main_window(None)  # Обновляем интерфейс
+        del info
+
+    # ------------------------------------- END системное меню----------------------------------------
 
 
 if __name__ == '__main__':

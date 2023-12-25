@@ -1,5 +1,6 @@
 import wx
 from utils import database_queries
+from dialog_window import documentation_dialog
 from dialog_window.view_command_dialog import ViewCommandData
 from dialog_window.edit_data_dialig import EditCommandOrModule
 
@@ -12,6 +13,8 @@ class PanelCenter(wx.Panel):
 
     def __init__(self, parent, id=wx.ID_ANY, pos=wx.DefaultPosition, size=wx.Size(600, 600), style=wx.TAB_TRAVERSAL, name=wx.EmptyString):
         wx.Panel.__init__(self, parent, id=id, pos=pos, size=size, style=style, name=name)
+
+        self.parent_dialog = self.GetParent()  # Родитель окна
 
         # Главный сайзер диалога
         sizer_main_panel = wx.BoxSizer(wx.VERTICAL)
@@ -33,6 +36,7 @@ class PanelCenter(wx.Panel):
             name_first_tb = self.notebook.GetPageText(0)
             self.add_cmd_to_tab(first_tab, name_first_tb)
         else:
+            # Если БД пустая открываем окно документации.
             wx.CallAfter(self.if_not_module)
 
         # Привязываем событие выбора вкладки
@@ -41,13 +45,12 @@ class PanelCenter(wx.Panel):
         self.SetSizer(sizer_main_panel)
         self.Layout()
 
-    # Обработчики
+    # ---------------- Обработчики событий---------------
     def if_not_module(self):
-        """Функция заполнения основной страницы (если в БД нет данных)"""
-        # Оповещение
-        message = (f"База данных пустая.\n"
-                   f"Необходимо заполнить базу данных")
-        wx.MessageBox(message, "Сообщение", wx.OK | wx.ICON_INFORMATION)
+        """Функция открытия страницы документации"""
+        start_dialog_doc = documentation_dialog.DocumentationDialog(self)
+        start_dialog_doc.ShowModal()
+        start_dialog_doc.Destroy()
 
     def add_tabs(self):
         """Функция для добавления вкладок в notebook"""
@@ -86,7 +89,6 @@ class PanelCenter(wx.Panel):
             # Обновляем расположение элементов в вкладке
             obj_selected_tab.scrol_wind.Layout()
             obj_selected_tab.Layout()
-
             event.Skip()
 
     def add_cmd_to_tab(self, tab, name_mod):
@@ -174,7 +176,6 @@ class PanelCenter(wx.Panel):
             wx.TheClipboard.SetData(clipboard_data)
             wx.TheClipboard.Close()
 
-    # Обработчик для опции "Изменить"
     def edit_cmd(self, command):
         """Функция для редактирования команды из контекстного меню"""
         edit_dialog = EditCommandOrModule(self)  # Создаем экземпляр класса
@@ -200,7 +201,6 @@ class PanelCenter(wx.Panel):
 
         edit_dialog.ShowModal()  # Отображаем окно
 
-    # ----------- Обработчик ----------
     def on_btn_apply(self, obj):
         """Изменяем данные о команде (через контекстное меню)"""
         # Получаем данные о команде из полей
