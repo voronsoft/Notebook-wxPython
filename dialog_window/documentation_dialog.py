@@ -2,9 +2,7 @@ import os
 import wx
 import wx.xrc
 import wx.html2
-from utils.database_queries import clear_database
-from instance.app_config import icons_folder_path, upd_db_folder_path, root_directory
-from db.creat_db_and_data import create_database, added_command_data_db
+from instance.app_config import root_directory
 
 
 ###########################################################################

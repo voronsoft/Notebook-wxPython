@@ -5,3 +5,7 @@ __pycache__
 /tst.py
 /tst1.py
 /tmp.py
+/app.spec
+/build
+/dist
+/test_exe

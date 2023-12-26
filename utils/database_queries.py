@@ -4,8 +4,6 @@ from sqlalchemy import create_engine, func, inspect, text
 from instance.app_config import path_to_DB
 
 # # Строим путь к файлу базы данных
-# path_to_DB = os.path.join(app_config.root_directory, 'db', 'db_notebook.db')  # Путь к БД относительно вызова функции
-
 engine = create_engine(f'sqlite:///{path_to_DB}', echo=True)  # Создаем соединение с базой данных
 Session = sessionmaker(bind=engine)  # Создаем сессию для взаимодействия с базой данных
 
