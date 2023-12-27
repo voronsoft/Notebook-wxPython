@@ -1,7 +1,9 @@
+import os
 import wx
 import wx.xrc
 import wx.richtext
 from utils import database_queries
+from instance.app_config import icons_folder_path
 
 
 ###########################################################################
@@ -14,6 +16,10 @@ class EditCommandOrModule(wx.Dialog):
         wx.Dialog.__init__(self, parent, id=wx.ID_ANY, title="Изменить данные", pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.DEFAULT_DIALOG_STYLE)
 
         self.parent_dialog = self.GetParent()  # Родитель окна
+
+        # Устанавливаем иконку для окна
+        icon = wx.Icon(f'{os.path.join(icons_folder_path, "notebook.ico")}', wx.BITMAP_TYPE_ICO)
+        self.SetIcon(icon)
 
         self.SetSizeHints(wx.DefaultSize, wx.DefaultSize)
         self.SetFont(wx.Font(10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))

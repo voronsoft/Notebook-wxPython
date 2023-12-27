@@ -1,6 +1,8 @@
+import os
 import wx
 import wx.xrc
 from utils import database_queries
+from instance.app_config import icons_folder_path
 
 
 # class StatisticDialog(wx.Dialog):
@@ -60,6 +62,9 @@ class StatisticDialog(wx.Dialog):
         wx.Dialog.__init__(self, parent, id=wx.ID_ANY, title="Статистика", pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.DEFAULT_DIALOG_STYLE)
 
         self.SetSizeHints(wx.DefaultSize, wx.DefaultSize)
+        # Устанавливаем иконку для окна
+        icon = wx.Icon(f'{os.path.join(icons_folder_path, "notebook.ico")}', wx.BITMAP_TYPE_ICO)
+        self.SetIcon(icon)
 
         sizer_maim = wx.BoxSizer(wx.VERTICAL)
         sizer_maim.SetMinSize(wx.Size(600, 600))

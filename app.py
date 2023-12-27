@@ -1,9 +1,7 @@
 import os
 import wx
 import wx.xrc
-
-from db.creat_db_and_data import create_database, added_command_data_db
-from instance.app_config import icons_folder_path, upd_db_folder_path
+from utils.database_queries import clear_database
 from dialog_window.search_dialog import SearchDialog
 from dialog_window.del_data_dialog import DelCmdOrMod
 from dialog_window.panel_center_dialog import PanelCenter
@@ -12,7 +10,8 @@ from dialog_window.statistics_dialog import StatisticDialog
 from dialog_window.add_data_dialog import AddCommandOrModule
 from dialog_window.edit_data_dialig import EditCommandOrModule
 from dialog_window.documentation_dialog import DocumentationDialog
-from utils.database_queries import clear_database
+from instance.app_config import icons_folder_path, upd_db_folder_path
+from db.creat_db_and_data import create_database, added_command_data_db
 
 
 ###########################################################################
@@ -52,6 +51,9 @@ class FrameMain(wx.Frame):
         self.SetSizeHints(wx.Size(-1, -1), wx.DefaultSize)
         self.SetBackgroundColour(wx.Colour(255, 255, 255))  # Установка цвета фона окна (белый)
         self.SetMinSize(wx.Size(600, 600))  # Устанавливаем минимальные размеры окна
+        # Устанавливаем иконку для окна
+        icon = wx.Icon(f'{os.path.join(icons_folder_path, "notebook.ico")}', wx.BITMAP_TYPE_ICO)
+        self.SetIcon(icon)
 
         # Создаем системное меню
         menu_bar = wx.MenuBar()

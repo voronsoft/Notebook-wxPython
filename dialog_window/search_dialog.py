@@ -1,9 +1,11 @@
+import os
 import wx
 import wx.xrc
 import wx.richtext
+from instance.app_config import icons_folder_path
 from utils.database_queries import request_to_get_all_modules, request_get_commands
 
-# TODO если удалить все модули с командами поиск не работает
+
 ###########################################################################
 # Class SearchDialog
 ###########################################################################
@@ -15,6 +17,9 @@ class SearchDialog(wx.Dialog):
         wx.Dialog.__init__(self, parent, id=wx.ID_ANY, title="Поиск", pos=wx.DefaultPosition, size=wx.Size(600, 600), style=wx.DEFAULT_DIALOG_STYLE)
 
         self.SetSizeHints(wx.DefaultSize, wx.DefaultSize)
+        # Устанавливаем иконку для окна
+        icon = wx.Icon(f'{os.path.join(icons_folder_path, "notebook.ico")}', wx.BITMAP_TYPE_ICO)
+        self.SetIcon(icon)
         self.SetFont(wx.Font(10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
 
         # Главный сайзер окна
@@ -64,7 +69,11 @@ class SearchDialog(wx.Dialog):
         sizer_choice.Add(self.modules_choice, 1, wx.ALL | wx.EXPAND, 5)
         sizer_main.Add(sizer_choice, 0, wx.ALL | wx.EXPAND, 5)
 
-        commands_choiceChoices = [item['commands_name'] for item in request_get_commands(modules_choiceChoices[0])]
+        if modules_choiceChoices:
+            commands_choiceChoices = [item['commands_name'] for item in request_get_commands(modules_choiceChoices[0])]
+        else:
+            commands_choiceChoices = []
+
         self.commands_choice = wx.Choice(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, commands_choiceChoices, 0 | wx.BORDER_SIMPLE)
         # Привязываем обработчик события к выбору команды
         self.commands_choice.Bind(wx.EVT_CHOICE, self.on_command_select)

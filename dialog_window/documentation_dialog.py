@@ -2,7 +2,7 @@ import os
 import wx
 import wx.xrc
 import wx.html2
-from instance.app_config import root_directory
+from instance.app_config import root_directory, icons_folder_path
 
 
 ###########################################################################
@@ -19,6 +19,9 @@ class DocumentationDialog(wx.Dialog):
 
         self.SetSizeHints(wx.Size(600, 600), wx.DefaultSize)
         self.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNHIGHLIGHT))
+        # Устанавливаем иконку для окна
+        icon = wx.Icon(f'{os.path.join(icons_folder_path, "notebook.ico")}', wx.BITMAP_TYPE_ICO)
+        self.SetIcon(icon)
 
         # Главный сайзер
         sizer_main = wx.BoxSizer(wx.VERTICAL)

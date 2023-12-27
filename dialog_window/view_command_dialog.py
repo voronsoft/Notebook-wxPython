@@ -1,6 +1,8 @@
+import os
 import wx
 import wx.html
 import wx.richtext
+from instance.app_config import icons_folder_path
 
 
 ###########################################################################
@@ -13,6 +15,10 @@ class ViewCommandData(wx.Dialog):
         wx.Dialog.__init__(self, parent, id=wx.ID_ANY, title='Данные о команде', pos=wx.DefaultPosition, size=wx.Size(600, 600), style=wx.DEFAULT_DIALOG_STYLE | wx.MAXIMIZE_BOX | wx.MINIMIZE_BOX)
 
         self.SetSizeHints(wx.DefaultSize, wx.DefaultSize)
+        # Устанавливаем иконку для окна
+        icon = wx.Icon(f'{os.path.join(icons_folder_path, "notebook.ico")}', wx.BITMAP_TYPE_ICO)
+        self.SetIcon(icon)
+
         # Главный сайзер окна
         sizer_main = wx.BoxSizer(wx.VERTICAL)
 
