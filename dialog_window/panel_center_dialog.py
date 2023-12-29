@@ -27,7 +27,6 @@ class PanelCenter(wx.Panel):
         # Список вкладок (модулей) панели notebook
         self.list_tabs_mod = [self.notebook.GetPage(i) for i in range(self.notebook.GetPageCount())]
 
-        # TODO если удалить все модули то приложение не запускается из за ошибки в строке 31
         # ######### Загружаем данные для первой вкладки при запуске главной страницы (что-бы страница не была пустой)
         # Если есть хоть одна вкладка (модуль) и она пустая (без команд), загружаем команды
         if len(self.list_tabs_mod) > 0 and self.list_tabs_mod[0].scrol_wind.GetSizer().GetItemCount() == 0:

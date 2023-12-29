@@ -3,18 +3,26 @@ import os
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from instance.app_config import path_to_DB
+from instance.app_config import path_to_DB, local_appdata
 from db.models import Base, Module, Command, CommandModuleAssociation
 
 
 def create_database():
     """Создание базы данных"""
+
+    # Создаем путь к папке программы и файлу БД
+    program_folder = os.path.join(local_appdata, 'Notebook')
+
+    # Проверяем существование папки программы, если нет - создаем
+    if not os.path.exists(program_folder):
+        os.makedirs(program_folder)
+
     # Создаем соединение с базой данных
     engine = create_engine(f'sqlite:///{path_to_DB}', echo=True)
     print('===================================================================')
     print(f'Бд db_notebook.db создана по пути: sqlite:///{path_to_DB}')
 
-    print('проба узнать реальный путь теперь', os.getcwd())
+    print('Получаем корневую директорию проекта: ', os.getcwd())
     print('===================================================================')
     # Создаем сессию для взаимодействия с базой данных
     Session = sessionmaker(bind=engine)

@@ -1,0 +1,82 @@
+Class magic methods:Список магических методов, используемых в классах Python для перегрузки операторов и изменения стандартного поведения.
+__new__(cls[, ...]):Управляет созданием экземпляра. В качестве обязательного аргумента принимает класс (не путать с экземпляром). Должен возвращать экземпляр класса для его последующей его передачи методу __init__.: No example
+__init__(self[, ...]):Как уже было сказано выше, конструктор.: No example
+__del__(self):Вызывается при удалении объекта сборщиком мусора.: No example
+__repr__(self):Вызывается встроенной функцией repr; возвращает "сырые" данные, использующиеся для внутреннего представления в python: No example
+__str__(self):Вызывается функциями str, print и format. Возвращает строковое представление объекта.: No example
+__bytes__(self):Вызывается функцией bytes при преобразовании к байтам.: No example
+__floor__(self):Определяет поведение для math.floor(), то есть, округления до ближайшего меньшего целого.: No example
+__format__(self, format_spec):Используется функцией format (а также методом format у строк).: No example
+__lt__(self, other):Определяет поведение оператора меньше, <.: No example
+__le__(self, other):Определяет поведение оператора меньше или равно, <=.: No example
+__eq__(self, other):Определяет поведение оператора равенства, ==.: No example
+__ne__(self, other):Определяет поведение оператора неравенства, !=.: No example
+__gt__(self, other):Определяет поведение оператора больше, >.: No example
+__ge__(self, other):Определяет поведение оператора больше или равно, >=.: No example
+__hash__(self):Получение хэш-суммы объекта, например, для добавления в словарь.: No example
+__bool__(self):Вызывается при проверке истинности. Если этот метод не определён, вызывается метод __len__ (объекты, имеющие ненулевую длину, считаются истинными).: No example
+__getattr__(self, item):Авт. вызывается при получении несуществующего свойства item класса.: No example
+__getattribute__(self, item):Авт. вызывается при получении свойства класса с именем item. Что бы не было зацикливания return object.__getattribute__(self, item) - обращение делать от родительского класса object: No example
+__setattr__(self, key, value):Авт. вызывается при изменении свойства key класса. Что бы не было зацикливания обращаемся через object. __setattr__(self, key, value). Будет зацикливание !!!! не писать так- self.key = value: No example
+__delattr__(self, name):Удаление атрибута (del obj.name).: No example
+__call__(self[, args...]):Вызов экземпляра класса как функции.: No example
+__len__(self):Длина объекта.: No example
+__getitem__(self, key):Доступ по индексу (или ключу).: No example
+__setitem__(self, key, value):Назначение элемента по индексу.: No example
+__delitem__(self, key):Удаление элемента по индексу.: No example
+__iter__(self):Возвращает итератор для контейнера.: No example
+__reversed__(self):Итератор из элементов, следующих в обратном порядке.: No example
+__ceil__(self):Определяет поведение для math.ceil(), то есть, округления до ближайшего большего целого.: No example
+__trunc__(self):Определяет поведение для math.trunc(), то есть, обрезания до целого.: No example
+__contains__(self, item):Проверка на принадлежность элемента контейнеру (item in self).: No example
+__instancecheck__(self, instance):Проверяет, является ли экземпляр членом вашего класса (isinstance(instance, class), например.: No example
+__subclasscheck__(self, subclass):Проверяет, является наследуется ли класс от вашего класса (issubclass(subclass, class)).: No example
+__add__(self, other):Сложение. С = x + y вызывает x.__add__(y).создает новый экземпляр: No example
+__sub__(self, other):Вычитание (x - y).: No example
+__mul__(self, other):Умножение (x * y).: No example
+__div__(self, other):Деление, оператор /.: No example
+__truediv__(self, other):Деление (x / y). Правильное деление. Заметьте, что это работает только когда используется from __future__ import division.: No example
+__floordiv__(self, other):Целочисленное деление (x // y).: No example
+__mod__(self, other):Остаток от деления (x % y).: No example
+__divmod__(self, other):Частное и остаток (divmod(x, y)).: No example
+__pow__(self, other[, modulo]):Возведение в степень (x ** y, pow(x, y[, modulo])).: No example
+__lshift__(self, other):Битовый сдвиг влево (x << y).: No example
+__rshift__(self, other):Битовый сдвиг вправо (x >> y).: No example
+__and__(self, other):Битовое И (x & y).: No example
+__xor__(self, other):Битовое ИСКЛЮЧАЮЩЕЕ ИЛИ (x ^ y).: No example
+__or__(self, other):Битовое ИЛИ (x | y).: No example
+__radd__(self, other):с = 100 + Object (можно прибавлять число к объекту если объект находится справа. Создается новый экземпляр класса: No example
+__rsub__(self, other):c = 100 - Object применяется когда число слева от объекта: No example
+__rmul__(self, other):Отражённое умножение.: No example
+__rtruediv__(self, other):Отражённое правильное деление. Заметьте, что работает только когда используется from __future__ import division.: No example
+__rfloordiv__(self, other):Отражённое целочисленное деление, оператор //.: No example
+__rmod__(self, other):Отражённый остаток от деления, оператор %.: No example
+__rdivmod__(self, other):Определяет поведение для встроенной функции divmod(), когда вызывается divmod(other, self).: No example
+__rpow__(self, other):Отражённое возведение в степерь, оператор **.: No example
+__rlshift__(self, other):Отражённый двоичный сдвиг влево, оператор <<.: No example
+__rrshift__(self, other):Отражённый двоичный сдвиг вправо, оператор >>.: No example
+__rand__(self, other):Отражённое двоичное И, оператор &.: No example
+__rxor__(self, other):Отражённый двоичный xor, оператор ^.: No example
+__ror__(self, other):Отражённое двоичное ИЛИ, оператор |.: No example
+__iadd__(self, other):- += (увеличить к существующему) C1 += 100 отработает но создаст новый экземпляр, что не требуется при инкрементации += .В функции следует указать, что нужно увеличить существующую величину прибавив заданную, не создавая новый экземпляр: No example
+__isub__(self, other):- -=.Вычитание с присваиванием.: No example
+__imul__(self, other):- *=. Умножение с присваиванием.: No example
+__itruediv__(self, other):- /=. Правильное деление с присваиванием. Заметьте, что работает только если используется from __future__ import division.:operator.__itruediv__(a, b) a = itruediv(a, b) Эквивалентно a /= b.
+__ifloordiv__(self, other):Целочисленное деление, оператор //.: No example
+__imod__(self, other):- %=. Остаток от деления с присваиванием, оператор %=.: No example
+__ipow__(self, other[, modulo]):- **=. Возведение в степерь с присваиванием, оператор **=.:a = ipow(a, b) эквивалентно a **= b.
+__ilshift__(self, other):- <<=. Двоичный сдвиг влево с присваиванием, оператор <<=.: No example
+__irshift__(self, other):- >>=. Двоичный сдвиг вправо с присваиванием, оператор >>=: No example
+__iand__(self, other):- &=. Двоичное И с присваиванием, оператор &=.: No example
+__ixor__(self, other):- ^=. Двоичный xor с присваиванием, оператор ^=.: No example
+__ior__(self, other):- |=. Двоичное ИЛИ с присваиванием, оператор |=.: No example
+__neg__(self)"Унарный:-.: No example
+__pos__(self):Унарный +. Определяет поведение для унарного плюса (+some_object): No example
+__abs__(self):Модуль (abs()).: No example
+__invert__(self):Инверсия (~).: No example
+__complex__(self):Приведение к complex.: No example
+__int__(self):Приведение к int.: No example
+__float__(self):Приведение к float.: No example
+__round__(self[, n]):Округление.: No example
+__enter__(self), __exit__(self, exc_type, exc_value, traceback):Определяет, что должен сделать менеджер контекста в начале блока, созданного оператором with. Заметьте, что возвращаемое __enter__ значение и есть то значение, с которым производится работа внутри with.: No example
+__exit__(self, exc_type, exc_val, exc_tb):Определяет действия менеджера контекста после того, как блок будет выполнен (или прерван во время работы). Может использоваться для контроллирования исключений, чистки, любых действий которые должны быть выполнены незамедлительно после блока внутри with. Если блок выполнен успешно, exc_type, exc_val, exc_tb будут установлены в None. В другом случае вы сами выбираете, перехватывать ли исключение или предоставить это пользователю; если вы решили перехватить исключение, убедитесь, что __exit__ возвращает True после того как всё сказано и сделано. Если вы не хотите, чтобы исключение было перехвачено менеджером контекста, просто позвольте ему случиться.: No example

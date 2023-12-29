@@ -3,7 +3,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine, func, inspect, text
 from instance.app_config import path_to_DB
 
-# # Строим путь к файлу базы данных
+# Строим путь к файлу базы данных
 engine = create_engine(f'sqlite:///{path_to_DB}', echo=True)  # Создаем соединение с базой данных
 Session = sessionmaker(bind=engine)  # Создаем сессию для взаимодействия с базой данных
 

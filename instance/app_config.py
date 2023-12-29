@@ -12,5 +12,11 @@ img_folder_path = os.path.join(root_directory, 'html', 'img')
 # Путь к файлу с восстановлением БД в исходное состояние
 upd_db_folder_path = os.path.join(root_directory, "db", "data_add_db")
 
+# ============ БД ===========
+# Получаем путь к локальной папке AppData для Windows
+local_appdata = os.getenv('LOCALAPPDATA')
+
 # Путь к файлу БД
-path_to_DB = os.path.join(root_directory, 'db', 'db_notebook.db')
+# path_to_DB = os.path.join(root_directory, 'db', 'db_notebook.db')
+path_to_DB = os.path.join(local_appdata, 'Notebook', 'db_notebook.db')
+# ============ БД ===========

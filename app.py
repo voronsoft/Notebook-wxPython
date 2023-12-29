@@ -258,6 +258,8 @@ class FrameMain(wx.Frame):
 
     def load_bd_python(self, event):
         """Загрузка БД для Python"""
+        print('=======upd_db_folder_path', upd_db_folder_path)
+        print('=======', os.path.join(upd_db_folder_path, "list_data_add_db.txt"))
         clear_database()  # Очищаем БД
         create_database()  # Создаем БД
 
@@ -287,6 +289,9 @@ class FrameMain(wx.Frame):
 
 
 if __name__ == '__main__':
+    # Создаем БД
+    create_database()
+    # Запуск приложения
     app = wx.App(False)
     frame = FrameMain(None)
     frame.Show(True)
