@@ -15,6 +15,9 @@ class ViewCommandData(wx.Dialog):
         wx.Dialog.__init__(self, parent, id=wx.ID_ANY, title='Данные о команде', pos=wx.DefaultPosition, size=wx.Size(600, 600), style=wx.DEFAULT_DIALOG_STYLE | wx.MAXIMIZE_BOX | wx.MINIMIZE_BOX)
 
         self.SetSizeHints(wx.DefaultSize, wx.DefaultSize)
+        font = wx.Font(12, wx.DEFAULT, wx.NORMAL, wx.NORMAL)  # Задаем шрифт
+        self.SetFont(font)
+
         # Устанавливаем иконку для окна
         icon = wx.Icon(f'{os.path.join(icons_folder_path, "notebook.ico")}', wx.BITMAP_TYPE_ICO)
         self.SetIcon(icon)

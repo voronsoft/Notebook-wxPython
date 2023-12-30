@@ -22,7 +22,7 @@ class EditCommandOrModule(wx.Dialog):
         self.SetIcon(icon)
 
         self.SetSizeHints(wx.DefaultSize, wx.DefaultSize)
-        self.SetFont(wx.Font(10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
+        self.SetFont(wx.Font(12, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
         # Главный сайзер окна
         sizer_main_dialog = wx.BoxSizer(wx.VERTICAL)
         sizer_main_dialog.SetMinSize(wx.Size(600, 600))
@@ -130,7 +130,6 @@ class PanelEditModule(wx.Panel):
         self.lst_mod_obj = database_queries.request_to_get_all_modules()
         choice_modChoices = [mod_item['module_name'] for mod_item in self.lst_mod_obj]  # Получаем список модулей
         self.choice_mod = wx.Choice(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, choice_modChoices, 0)
-        self.choice_mod.SetFont(wx.Font(12, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False, "Arial"))
         self.choice_mod.SetForegroundColour(wx.Colour(255, 0, 0))  # RGB цвет для красного
         self.choice_mod.SetSelection(-1)
         sizer_data.Add(self.choice_mod, 0, wx.ALL | wx.EXPAND, 5)
@@ -272,7 +271,6 @@ class PanelEditCommand(wx.Panel):
         self.lst_mod_obj = database_queries.request_to_get_all_modules()
         self.choice_modChoices = [mod_item['module_name'] for mod_item in self.lst_mod_obj]  # Получаем список модулей
         self.choice_mod = wx.Choice(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, self.choice_modChoices, 0)
-        self.choice_mod.SetFont(wx.Font(12, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False, "Arial"))
         self.choice_mod.SetForegroundColour(wx.Colour(255, 0, 0))  # RGB цвет для красного
         self.choice_mod.SetSelection(-1)
         self.sizer_indiv_edit_cmd.Add(self.choice_mod, 0, wx.ALL | wx.EXPAND, 5)
@@ -303,7 +301,6 @@ class PanelEditCommand(wx.Panel):
         sizer_data.Add(self.descr_label, 0, wx.LEFT | wx.RIGHT | wx.TOP, 5)
         # Поле описания команды
         self.descr_inp_text = wx.richtext.RichTextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size(-1, 200), 0 | wx.HSCROLL | wx.VSCROLL | wx.WANTS_CHARS)
-        self.descr_inp_text.SetFont(wx.Font(10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
         self.descr_inp_text.SetMinSize(wx.Size(-1, 200))
         sizer_data.Add(self.descr_inp_text, 2, wx.EXPAND | wx.BOTTOM | wx.RIGHT | wx.LEFT, 5)
         #
@@ -312,7 +309,6 @@ class PanelEditCommand(wx.Panel):
         sizer_data.Add(self.exampl_label, 0, wx.EXPAND | wx.TOP | wx.RIGHT | wx.LEFT, 5)
         # Поле пример
         self.exampl_inp_text = wx.richtext.RichTextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size(-1, 200), 0 | wx.VSCROLL | wx.HSCROLL | wx.NO_BORDER | wx.WANTS_CHARS)
-        self.exampl_inp_text.SetFont(wx.Font(10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
         self.exampl_inp_text.SetMinSize(wx.Size(-1, 100))
         sizer_data.Add(self.exampl_inp_text, 1, wx.EXPAND | wx.BOTTOM | wx.RIGHT | wx.LEFT, 5)
 

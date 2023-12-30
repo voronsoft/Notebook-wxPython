@@ -50,6 +50,9 @@ class FrameMain(wx.Frame):
         # Устанавливаем пропорциональность окна в зависимости от разности разрешений мониторов
         self.SetSizeHints(wx.Size(-1, -1), wx.DefaultSize)
         self.SetBackgroundColour(wx.Colour(255, 255, 255))  # Установка цвета фона окна (белый)
+        font = wx.Font(12, wx.DEFAULT, wx.NORMAL, wx.NORMAL)  # Задаем шрифт
+        self.SetFont(font)
+
         self.SetMinSize(wx.Size(600, 600))  # Устанавливаем минимальные размеры окна
         # Устанавливаем иконку для окна
         icon = wx.Icon(f'{os.path.join(icons_folder_path, "notebook.ico")}', wx.BITMAP_TYPE_ICO)

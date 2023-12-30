@@ -20,7 +20,7 @@ class SearchDialog(wx.Dialog):
         # Устанавливаем иконку для окна
         icon = wx.Icon(f'{os.path.join(icons_folder_path, "notebook.ico")}', wx.BITMAP_TYPE_ICO)
         self.SetIcon(icon)
-        self.SetFont(wx.Font(10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
+        self.SetFont(wx.Font(12, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
 
         # Главный сайзер окна
         sizer_main = wx.BoxSizer(wx.VERTICAL)
@@ -33,7 +33,6 @@ class SearchDialog(wx.Dialog):
         self.searchCtrl = wx.SearchCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size(212, -1), wx.TE_LEFT)
         self.searchCtrl.ShowSearchButton(True)
         self.searchCtrl.ShowCancelButton(False)
-        self.searchCtrl.SetFont(wx.Font(10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
         self.searchCtrl.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_HIGHLIGHTTEXT))
 
         # Кнопка поиска
@@ -51,12 +50,10 @@ class SearchDialog(wx.Dialog):
 
         self.module_label = wx.StaticText(self, wx.ID_ANY, "Модуль", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTER_HORIZONTAL | wx.BORDER_THEME)
         self.module_label.Wrap(-1)
-        self.module_label.SetFont(wx.Font(10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
         sizer_choice.Add(self.module_label, 1, wx.ALIGN_CENTER_VERTICAL | wx.ALL | wx.EXPAND, 5)
 
         self.command_label = wx.StaticText(self, wx.ID_ANY, "Команда", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTER_HORIZONTAL | wx.BORDER_THEME)
         self.command_label.Wrap(-1)
-        self.command_label.SetFont(wx.Font(10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
         sizer_choice.Add(self.command_label, 1, wx.ALIGN_CENTER_VERTICAL | wx.ALL | wx.EXPAND, 5)
 
         modules_choiceChoices = [mod_item['module_name'] for mod_item in request_to_get_all_modules()]  # Получаем список модулей
@@ -65,7 +62,6 @@ class SearchDialog(wx.Dialog):
         self.modules_choice.Bind(wx.EVT_CHOICE, self.on_module_select)
 
         self.modules_choice.SetSelection(0)
-        self.modules_choice.SetFont(wx.Font(10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
         sizer_choice.Add(self.modules_choice, 1, wx.ALL | wx.EXPAND, 5)
         sizer_main.Add(sizer_choice, 0, wx.ALL | wx.EXPAND, 5)
 
@@ -79,7 +75,6 @@ class SearchDialog(wx.Dialog):
         self.commands_choice.Bind(wx.EVT_CHOICE, self.on_command_select)
 
         self.commands_choice.SetSelection(0)
-        self.commands_choice.SetFont(wx.Font(10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
         sizer_choice.Add(self.commands_choice, 1, wx.ALL | wx.EXPAND, 5)
 
         # Сайзер вывода основных данных
@@ -87,13 +82,11 @@ class SearchDialog(wx.Dialog):
 
         self.description_label = wx.StaticText(self, wx.ID_ANY, "Описание:", wx.DefaultPosition, wx.DefaultSize, 0)
         self.description_label.Wrap(-1)
-        self.description_label.SetFont(wx.Font(10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
 
         sizer_data.Add(self.description_label, 0, wx.ALL, 5)
 
         # Поле вывода данных
         self.description_text = wx.richtext.RichTextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 | wx.BORDER_THEME | wx.HSCROLL | wx.VSCROLL | wx.WANTS_CHARS)
-        self.description_text.SetFont(wx.Font(10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
         self.description_text.SetEditable(False)  # Делаем текст только для чтения
 
         sizer_data.Add(self.description_text, 1, wx.EXPAND | wx.ALL, 5)

@@ -23,7 +23,7 @@ class AddCommandOrModule(wx.Dialog):
         self.SetIcon(icon)
 
         self.SetSizeHints(wx.DefaultSize, wx.DefaultSize)
-        self.SetFont(wx.Font(10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
+        self.SetFont(wx.Font(12, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
         # Главный сайзер окна
         self.sizer_main_dialog = wx.BoxSizer(wx.VERTICAL)
         self.sizer_main_dialog.SetMinSize(wx.Size(600, 600))
