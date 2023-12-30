@@ -7,10 +7,9 @@
 #define MyAppURL "https://github.com/voronsoft/Notebook-wxPython"
 #define MyAppExeName "Notebook.exe"
 #define MyAppExeNameDel "Uninstall"
-
-; Если запустить файл для компиляции файла установки (setup)
-; следует указать абсолютный путь к папке где лежат файлы устанавливаемого приложения
-#define MyFolder "C:\Users\Nirik\Desktop\notebook_setup"
+; Cледует указать абсолютный путь к выходной папке (в эту папку будет сохранен скомпилированный файл (setup)
+; !!! Для совсем маленьких ) измените путь на тот в котором сейчас находится этот файл сценарий
+#define MyFolder "C:\Notebook-wxPython\notebook_setup"
 
 [Setup]
 AppId={{39F7701A-E911-42DD-988A-1285F1592112}
@@ -27,16 +26,17 @@ DefaultGroupName=Notebook
 ; Путь куда будет помещен инсталятор и его зависимости после сборки
 OutputDir={#MyFolder}
 ; Путь к файлу Readme.txt
-InfoBeforeFile="{#MyFolder}\Readme.txt"
-; Зоздание папки в меню Пуск
+InfoBeforeFile=Readme.txt
+; Создание папки в меню Пуск
 DisableProgramGroupPage=yes
 ; Название установщика
 OutputBaseFilename=Notebook-setup-{#MyAppVersion}
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
-;Uninstallable=yes
-; Путь к пользовательской иконке для вкладки "Удаление программ"
+;Путь к иконке для файла setup.exe
+SetupIconFile="{#MyFolder}\Source\icons\notebook.ico"
+; Устанавливает иконку для отображения в списке установленных программ в Панели управления при удалении приложения.
 UninstallDisplayIcon={app}\icons\uninstall_notebook.ico
 ; Путь для установки приложения
 DefaultDirName={autopf}\{#MyAppName} {#MyAppVersion}
