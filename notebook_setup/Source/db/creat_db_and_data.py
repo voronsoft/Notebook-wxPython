@@ -1,21 +1,30 @@
 """Файл для создания БД db-notebook (sqlite3)"""
 import os
-
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from instance.app_config import path_to_DB
+from instance.app_config import path_to_DB, local_appdata
 from db.models import Base, Module, Command, CommandModuleAssociation
+from logs.app_logger import logger_debug
 
 
 def create_database():
     """Создание базы данных"""
-    # Создаем соединение с базой данных
-    engine = create_engine(f'sqlite:///{path_to_DB}', echo=True)
-    print('===================================================================')
-    print(f'Бд db_notebook.db создана по пути: sqlite:///{path_to_DB}')
 
-    print('проба узнать реальный путь теперь', os.getcwd())
-    print('===================================================================')
+    # Создаем путь к папке программы и файлу БД
+    program_folder = os.path.join(local_appdata, 'Notebook')
+    # Создаем путь к папке для логов
+    log_folder = os.path.join(local_appdata, 'Notebook', 'Logs')
+
+    # Проверяем существование папки программы, если нет - создаем
+    if not os.path.exists(program_folder):
+        os.makedirs(program_folder)
+        # Добавляем папку для логов
+        os.makedirs(log_folder)
+
+    # Создаем соединение с базой данных
+    engine = create_engine(f'sqlite:///{path_to_DB}', echo=False)  # Создаем соединение с базой данных echo=False отключит вывод запросов в консоль
+    logger_debug.debug(f'Бд db_notebook.db создана по пути: sqlite:///{path_to_DB}')
+
     # Создаем сессию для взаимодействия с базой данных
     Session = sessionmaker(bind=engine)
     with Session() as session:
@@ -24,14 +33,9 @@ def create_database():
             Base.metadata.create_all(engine)
             # Сохранение изменений в базе данных
             session.commit()
-            print('===================================================================')
-            print('Бд db_notebook.db создана')
-            print('===================================================================')
-            print()
+            logger_debug.debug("Бд db_notebook.db создана")
         except Exception as e:
-            print('===================================================================')
-            print(f'Ошибка при создании БД:\n{str(e)}')
-            print('===================================================================')
+            logger_debug.exception(f'{e}')
             session.rollback()  # Откатываем изменения в случае ошибки
 
 
@@ -43,7 +47,7 @@ def read_file(file_path=None):
             name_modul_descr = data.pop(0)
             return name_modul_descr, data
     else:
-        print('Путь к файлу не указан!')
+        logger_debug.debug(f'Путь к файлу не указан!')
 
 
 def added_command_data_db(path_file_data=None):
@@ -53,7 +57,7 @@ def added_command_data_db(path_file_data=None):
     """
 
     if not path_file_data:
-        print("Не указан путь к файлу данных!")
+        logger_debug.debug(f'Не указан путь к файлу данных!')
         return
 
     # Получаем данные из файла (название модуля, перечень команд с описанием)
@@ -62,7 +66,7 @@ def added_command_data_db(path_file_data=None):
     data_list = list(*data_temp[1:])  # Список команд
 
     # Создаем соединение с базой данных
-    engine = create_engine(f'sqlite:///{path_to_DB}', echo=True)
+    engine = create_engine(f'sqlite:///{path_to_DB}', echo=False)  # Создаем соединение с базой данных echo=False отключит вывод запросов в консоль
     # Создаем сессию для взаимодействия с базой данных
     Session = sessionmaker(bind=engine)
 
@@ -76,14 +80,9 @@ def added_command_data_db(path_file_data=None):
                     module = Module(module_name=name_modul, description=modul_description)
                     session.add(module)
                     session.commit()
-                    print('===================================================================')
-                    print(f'Модуль {name_modul} создан.')
-                    print('===================================================================')
-                    print()
+                    logger_debug.debug(f'Модуль {name_modul} создан.')
             except Exception as error:
-                print('===================================================================')
-                print(f'Ошибка при добавлении Модуля в БД (Module таблица):\n{str(error)}')
-                print('===================================================================')
+                logger_debug.exception(f'Ошибка при добавлении Модуля в БД (Module таблица):\n{str(error)}')
                 session.rollback()  # Откатываем изменения в случае ошибки
 
             # Добавление команды в БД
@@ -97,10 +96,7 @@ def added_command_data_db(path_file_data=None):
                         command = Command(command_name=name, description=desc)
                         session.add(command)
                         session.commit()
-                        print('===================================================================')
-                        print(f'Команда {name} добавлена.')
-                        print('===================================================================')
-                        print()
+                        logger_debug.debug(f'Команда {name} добавлена.')
                         # Добавляем связи модуль - команда (таблицы command_module_association)
                         try:
                             modul = session.query(Module).filter_by(module_name=name_modul).first()
@@ -108,22 +104,15 @@ def added_command_data_db(path_file_data=None):
                             association = CommandModuleAssociation(command_id=command.id, module_id=modul.id)
                             session.add(association)
                             session.commit()
-                            print('===================================================================')
-                            print(f'Связь модуль {modul.module_name}({modul.id}) - ({command.id}){command.command_name} команда добавлена')
-                            print('===================================================================')
-                            print()
+                            logger_debug.debug(f'Связь модуль {modul.module_name}({modul.id}) - ({command.id}){command.command_name} команда добавлена')
                         except Exception as error:
-                            print('===================================================================')
-                            print(f'Ошибка при добавлении связи в БД (command_module_association - таблица):\n{str(error)}')
-                            print('===================================================================')
+                            logger_debug.exception(f'Ошибка при добавлении связи в БД (command_module_association - таблица):\n{str(error)}')
                             session.rollback()  # Откатываем изменения в случае ошибки
             except Exception as error:
-                print('===================================================================')
-                print(f'Ошибка при добавлении данных в БД (Общая):\n{str(error)}')
-                print('===================================================================')
+                logger_debug.exception(f'Ошибка при добавлении данных в БД (Общая):\n{str(error)}')
                 session.rollback()  # Откатываем изменения в случае ошибки
         else:
-            print("Не указано название модуля в файле !")
+            logger_debug.debug(f'Не указано название модуля в файле !')
 
 
 if __name__ == '__main__':

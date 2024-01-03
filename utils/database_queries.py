@@ -1,10 +1,12 @@
 from db.models import Module, Command
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import create_engine, func, inspect, text
 from instance.app_config import path_to_DB
+from sqlalchemy import create_engine, func, inspect, text
+
+from logs.app_logger import logger_debug
 
 # Строим путь к файлу базы данных
-engine = create_engine(f'sqlite:///{path_to_DB}', echo=True)  # Создаем соединение с базой данных
+engine = create_engine(f'sqlite:///{path_to_DB}', echo=False)  # Создаем соединение с базой данных echo=False отключит вывод запросов в консоль
 Session = sessionmaker(bind=engine)  # Создаем сессию для взаимодействия с базой данных
 
 
@@ -26,7 +28,7 @@ def request_to_get_all_modules():
 
         except Exception as e:
             # Обрабатываем возможные ошибки, например, выводим сообщение об ошибке
-            print(f"Ошибка при получении списка модулей: {e}")
+            logger_debug.exception(f"Ошибка при получении списка модулей: {e}")
             return []
 
 
@@ -47,7 +49,7 @@ def request_get_module(name_mod_str):
                 return False
         except Exception as e:
             # Выводим сообщение об ошибке
-            print(f"Ошибка при получении объекта-модуля: {e}")
+            logger_debug.exception(f"Ошибка при получении объекта-модуля: {e}")
             return 'error'
 
 
@@ -77,7 +79,7 @@ def request_get_commands(modul_name):
 
         except Exception as e:
             # Обрабатываем возможные ошибки, например, выводим сообщение об ошибке
-            print(f"Ошибка при получении списка команд: {e}")
+            logger_debug.exception(f"Ошибка при получении списка команд: {e}")
             return []
 
 
@@ -92,7 +94,7 @@ def count_commands_in_module(module_name):
 
         except Exception as e:
             # Обрабатываем возможные ошибки, например, выводим сообщение об ошибке
-            print(f"Ошибка при получении количества команд: {e}")
+            logger_debug.exception(f"Ошибка при получении количества команд: {e}")
             return 0
 
 
@@ -120,7 +122,7 @@ def show_full_command_info(command_name=None):
 
         except Exception as e:
             # Обрабатываем возможные ошибки, например, выводим сообщение об ошибке
-            print(f"Ошибка при получении полных данных о команде: {e}")
+            logger_debug.exception(f"Ошибка при получении полных данных о команде: {e}")
             return []
 
 
@@ -154,14 +156,14 @@ def add_command(name_cmd, description, example, module_obj):
                 session.commit()  # Фиксируем
 
                 # Возвращаем информацию о добавлении
-                print(f"Команда {name_cmd} успешно добавлена в БД.")
+                logger_debug.debug(f"Команда {name_cmd} успешно добавлена в БД.")
                 return True
             else:
-                print(f"Команда {name_cmd} есть в БД.")
+                logger_debug.debug(f"Команда {name_cmd} есть в БД.")
                 return False
         except Exception as e:
             # Ошибка при добавлении в БД команды
-            print(f"Ошибка добавления команды {name_cmd}: {e}")
+            logger_debug.exception(f"Ошибка добавления команды {name_cmd}: {e}")
             session.rollback()  # Откатываем изменения в случае ошибки
             return 'error'
 
@@ -195,7 +197,7 @@ def edit_command(cmd=None, name_new=None, descr_new=None, example_new=None):
 
         except Exception as e:
             # Ошибка при изменении команды
-            print(f"Ошибка при изменении команды {cmd}: {e}")
+            logger_debug.exception(f"Ошибка при изменении команды {cmd}: {e}")
             session.rollback()  # Откатываем изменения в случае ошибки
             return 'error'
 
@@ -216,13 +218,12 @@ def del_command(cmd_obj):
                 session.commit()
                 return True
             else:
-                print(f"Команда {name_cmd} не найдена в БД.")
+                logger_debug.debug(f"Команда {name_cmd} не найдена в БД.")
                 return False
         except Exception as e:
             # Ошибка при удалении из БД данных о команде
-            print(f"Ошибка при удалении из БД данных о команде: {e}")
+            logger_debug.exception(f"Ошибка при удалении из БД данных о команде: {e}")
             session.rollback()  # Откатываем изменения в случае ошибки
-            print("Откат изменений.")
             return 'error'
 
 
@@ -242,14 +243,14 @@ def add_module(name, descr):
                 session.commit()  # Фиксируем
 
                 # Возвращаем информацию о добавлении
-                print(f"Модуль {name} успешно добавлен в БД.")
+                logger_debug.debug(f'Модуль {name} успешно добавлен в БД.')
                 return True
             else:
-                print(f"Модуль {name} есть в БД.")
+                logger_debug.debug(f"Модуль {name} есть в БД.")
                 return False
         except Exception as e:
             # Ошибка при добавлении в БД модуля
-            print(f"Ошибка добавлении модуля {name}: {e}")
+            logger_debug.exception(f"Ошибка добавлении модуля {name}: {e}")
             session.rollback()  # Откатываем изменения в случае ошибки
             return 'error'
 
@@ -275,7 +276,7 @@ def edit_module(select_mod_name, name_new, descr_new):
                 return False
         except Exception as e:
             # Ошибка при изменении модуля
-            print(f"Ошибка при изменении модуля {select_mod_name}: {e}")
+            logger_debug.exception(f"Ошибка при изменении модуля {select_mod_name}: {e}")
             session.rollback()  # Откатываем изменения в случае ошибки
             return 'error'
 
@@ -302,14 +303,14 @@ def del_module(name_mod):
                 session.commit()  # Фиксируем удаление команд
 
                 # Возвращаем информацию об удалении
-                print(f"Модуль {name_mod} успешно удален, вместе с {len(related_commands)} связанными командами.")
+                logger_debug.debug(f"Модуль {name_mod} успешно удален, вместе с {len(related_commands)} связанными командами.")
                 return True
             else:
-                print(f"Модуль {name_mod} не найден в БД.")
+                logger_debug.debug(f"Модуль {name_mod} не найден в БД.")
                 return False
         except Exception as e:
             # Ошибка при удалении из БД данных о модуле или командах
-            print(f"Ошибка при удалении модуля {name_mod}: {e}")
+            logger_debug.exception(f"Ошибка при удалении модуля {name_mod}: {e}")
             session.rollback()  # Откатываем изменения в случае ошибки
             return 'error'
 
@@ -332,11 +333,10 @@ def clear_database():
 
             # Фиксируем изменения
             session.commit()
-
-            print("База данных успешно очищена.")
+            logger_debug.debug('База данных успешно очищена.')
 
         except Exception as e:
             # Ошибка при удалении данных
-            print(f"Ошибка при удалении данных из БД: {e}")
+            logger_debug.exception(f'Ошибка при удалении данных из БД: {e}')
             session.rollback()  # Откатываем изменения в случае ошибки
             return 'error'

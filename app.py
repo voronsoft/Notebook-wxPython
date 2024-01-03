@@ -1,6 +1,7 @@
 import os
 import wx
 import wx.xrc
+from logs.app_logger import logger_debug
 from utils.database_queries import clear_database
 from dialog_window.search_dialog import SearchDialog
 from dialog_window.del_data_dialog import DelCmdOrMod
@@ -17,7 +18,6 @@ from db.creat_db_and_data import create_database, added_command_data_db
 ###########################################################################
 # Class FrameMain
 ###########################################################################
-
 class FrameMain(wx.Frame):
     """
     Схема расположения сайзеров
@@ -199,7 +199,7 @@ class FrameMain(wx.Frame):
 
     def del_data_button_click(self, event):
         """Открытие окна Удалить данные"""
-        print('Включен диалог - "Удалить данные"')
+        logger_debug.debug('Включен диалог - "Удалить данные"')
         del_dialog = DelCmdOrMod(self)
         del_dialog.ShowModal()
         del_dialog.Destroy()
@@ -212,25 +212,29 @@ class FrameMain(wx.Frame):
 
     def update_main_window(self, event):
         """Обновление сайзера sizer_data главного окна"""
-        # Получаем текущий сайзер sizer_data
-        sizer_data = self.GetSizer().GetItem(1).GetSizer()
+        try:
+            # Получаем текущий сайзер sizer_data
+            sizer_data = self.GetSizer().GetItem(1).GetSizer()
 
-        # Замораживаем обновление экрана
-        self.Freeze()
+            # Замораживаем обновление экрана
+            self.Freeze()
 
-        # Уничтожаем все элементы в текущем сайзере
-        for item in sizer_data.GetChildren():
-            item.GetWindow().Destroy()
+            # Уничтожаем все элементы в текущем сайзере
+            for item in sizer_data.GetChildren():
+                item.GetWindow().Destroy()
 
-        # Создаем новый экземпляр класса PanelCenter
-        new_panel_center = PanelCenter(self)
-        # Добавляем новый экземпляр в сайзер sizer_data
-        sizer_data.Add(new_panel_center, 1, wx.EXPAND, 5)
+            # Создаем новый экземпляр класса PanelCenter
+            new_panel_center = PanelCenter(self)
+            # Добавляем новый экземпляр в сайзер sizer_data
+            sizer_data.Add(new_panel_center, 1, wx.EXPAND, 5)
 
-        # Обновляем отображение
-        self.Layout()
-        self.Thaw()
-        self.Refresh()
+            # Обновляем отображение
+            self.Layout()
+            self.Thaw()
+            self.Refresh()
+            logger_debug.debug(f'Главное окно обновлено')
+        except Exception as e:
+            logger_debug.exception(f'Ошибка при обновлении консоли приложения: {e}')
 
     # ----------------  Обработчики событий для пунктов системного меню ----------------
     def show_documentation(self, event):
@@ -258,8 +262,6 @@ class FrameMain(wx.Frame):
 
     def load_bd_python(self, event):
         """Загрузка БД для Python"""
-        print('=======upd_db_folder_path', upd_db_folder_path)
-        print('=======', os.path.join(upd_db_folder_path, "list_data_add_db.txt"))
         clear_database()  # Очищаем БД
         create_database()  # Создаем БД
 
@@ -295,4 +297,5 @@ if __name__ == '__main__':
     app = wx.App(False)
     frame = FrameMain(None)
     frame.Show(True)
+    logger_debug.debug("Приложение запущено")
     app.MainLoop()
