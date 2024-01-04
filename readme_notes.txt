@@ -17,6 +17,7 @@
 -- Логирование
     /logs - Функционал логинга
     Папка Logs для файлов логирования создается по пути - C:\Users\User\AppData\Local\Notebook\Logs
+    Реализовано 3 уровня фильтрации логов (DEBUG, WARNING, ERROR)
 
 -- База Данных
     Файл БД располагается по пути  - C:\Users\Nirik\AppData\Local\Notebook\db_notebook.db

@@ -155,7 +155,7 @@ class PanelEditModule(wx.Panel):
         sizer_bottom.Add(self.button_apply, 0, wx.ALIGN_RIGHT | wx.ALL, 5)
         sizer_main_panel_edit_mod.Add(sizer_bottom, 0, wx.EXPAND, 5)
 
-        # Привязываем обработчик события к выбору модуля
+        # Привязываем событие к выбору модуля
         self.choice_mod.Bind(wx.EVT_CHOICE, self.on_module_select)
         # Привязываем событие для кнопки - "Применить"
         self.button_apply.Bind(wx.EVT_BUTTON, self.on_btn_apply)

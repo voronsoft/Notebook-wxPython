@@ -37,9 +37,9 @@ logger_config = {
     'version': 1,
     # ФОРМАТЕРЫ логов
     'formatters': {
-        'verbose_debug': {'format': '{levelname} | {asctime} | Filename:{filename} | {message}', 'style': '{', },
-        'verbose_error': {'format': '{levelname} | {asctime} | {message} | Filename:{filename} Func:def {funcName}', 'style': '{', },
-        'verbose_warning': {'format': '{levelname} | {asctime} | {message} | Filename:{filename} Func:def {funcName}', 'style': '{', },
+        'verbose_debug': {'format': '--- {levelname} | {asctime} | Filename:{filename} | {message}\n', 'style': '{', },
+        'verbose_error': {'format': '--- {levelname} | {asctime} | {message} | Filename:{filename} Func:def {funcName}\n', 'style': '{', },
+        'verbose_warning': {'format': '--- {levelname} | {asctime} | {message} | Filename:{filename} Func:def {funcName}\n', 'style': '{', },
     },
     # ОБРАБОТЧИКИ логов
     'handlers': {

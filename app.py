@@ -5,6 +5,7 @@ from logs.app_logger import logger_debug
 from utils.database_queries import clear_database
 from dialog_window.search_dialog import SearchDialog
 from dialog_window.del_data_dialog import DelCmdOrMod
+from dialog_window.logging_dialog import LoggingDialog
 from dialog_window.panel_center_dialog import PanelCenter
 from dialog_window.about_program_dialog import AboutProgram
 from dialog_window.statistics_dialog import StatisticDialog
@@ -50,18 +51,17 @@ class FrameMain(wx.Frame):
         # Устанавливаем пропорциональность окна в зависимости от разности разрешений мониторов
         self.SetSizeHints(wx.Size(-1, -1), wx.DefaultSize)
         self.SetBackgroundColour(wx.Colour(255, 255, 255))  # Установка цвета фона окна (белый)
-        font = wx.Font(12, wx.DEFAULT, wx.NORMAL, wx.NORMAL)  # Задаем шрифт
-        self.SetFont(font)
+        self.SetFont(wx.Font(12, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
 
         self.SetMinSize(wx.Size(600, 600))  # Устанавливаем минимальные размеры окна
         # Устанавливаем иконку для окна
         icon = wx.Icon(f'{os.path.join(icons_folder_path, "notebook.ico")}', wx.BITMAP_TYPE_ICO)
         self.SetIcon(icon)
 
-        # Создаем системное меню
+        # ---------------------- Системное меню ----------------------
         menu_bar = wx.MenuBar()
 
-        # Меню "Файл"
+        # -- Меню "Файл"
         file_menu = wx.Menu()
         # 1
         load_bd_python_menu_item = file_menu.Append(wx.ID_ANY, "Загрузить БД Python", "Будет загружена БД для языка PYTHON")
@@ -83,7 +83,7 @@ class FrameMain(wx.Frame):
         exit_menu_item.SetBitmap(icon_exit)
         menu_bar.Append(file_menu, "Файл")
 
-        # Меню "Статистика"
+        # -- Меню "Статистика"
         stat_menu = wx.Menu()
         # 1
         stat_menu_item = stat_menu.Append(wx.ID_ANY, "Статистика", "Данные статистики по модулям и командам")
@@ -93,7 +93,7 @@ class FrameMain(wx.Frame):
         stat_menu_item.SetBitmap(icon_stat)
         menu_bar.Append(stat_menu, "Статистика")
 
-        # Меню "Help"
+        # -- Меню "Help"
         help_menu = wx.Menu()
         # 1
         documentation_menu_item = help_menu.Append(wx.ID_ANY, "Документация", "Открыть документацию")
@@ -107,9 +107,17 @@ class FrameMain(wx.Frame):
         # Загружаем иконку и связываем с пунктом
         icon_about = wx.Bitmap(os.path.join(icons_folder_path, "about16.png"), wx.BITMAP_TYPE_PNG)
         about_menu_item.SetBitmap(icon_about)
+
+        # 3
+        logs_menu_item = help_menu.Append(wx.ID_ANY, "Логи", "Просмотр логов программы")
+        self.Bind(wx.EVT_MENU, self.logs_info_show, logs_menu_item)
+        # Загружаем иконку и связываем с пунктом
+        icon_about = wx.Bitmap(os.path.join(icons_folder_path, "about16.png"), wx.BITMAP_TYPE_PNG)
+        logs_menu_item.SetBitmap(icon_about)
         menu_bar.Append(help_menu, "Help")
 
         self.SetMenuBar(menu_bar)  # Устанавливаем созданное меню
+        #  ---------------------- END Системное меню  ----------------------
 
         # Главный сайзер MAIN
         sizerMain = wx.BoxSizer(wx.VERTICAL)
@@ -256,6 +264,12 @@ class FrameMain(wx.Frame):
     def about_info(self, event):
         """Отображение информации о программе"""
         dialog = AboutProgram(self)
+        dialog.ShowModal()
+        dialog.Destroy()
+
+    def logs_info_show(self, event):
+        """Отображение логов программы"""
+        dialog = LoggingDialog(self)
         dialog.ShowModal()
         dialog.Destroy()
 
