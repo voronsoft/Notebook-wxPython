@@ -1,6 +1,11 @@
-**-- Программа Блокнот - команд. --**
-Использован модуль WxPython  
-БД - SQLite3 (SQLAlchemy)  
+**Программа Блокнот-команд.**   
+
+Использовано:
+- WxPython
+- SQLite3
+- SQLAlchemy
+- Logging  
+  
 В папке лежит файл Notebook-setup-1.0.exe установщик для Windows 7-10-11:  
 Notebook-setup-1.0.exe  
 Некоторые полезные заметки по проекту смотреть в - readme_notes.txt  
