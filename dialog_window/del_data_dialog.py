@@ -78,13 +78,11 @@ class DelCmdOrMod(wx.Dialog):
             child.GetWindow().Destroy()
 
         if self.radio_del_module.GetValue():  # Есл активна радио-кнопка - "Удалить МОДУЛЬ"
-            print('В диалоге "Удалить данные" активна радио-кнопка - "Удалить МОДУЛЬ"')
             del_mod_connect = PanelDelModule(self)  # Создаем экземпляр класса
             self.sizer_DYNAMIC_del.Add(del_mod_connect, 1, wx.EXPAND | wx.ALL, 5)
 
             self.sizer_DYNAMIC_del.Layout()
         elif self.radio_del_command.GetValue():  # Есл активна радио-кнопка - "Удалить КОМАНДУ"
-            print('В диалоге "Удалить данные" активна радио-кнопка - "Удалить КОМАНДУ"')
             del_cmd_connect = PanelDelCommand(self)  # Экземпляр класса PanelDelCommand
             self.sizer_DYNAMIC_del.Add(del_cmd_connect, 1, wx.EXPAND | wx.ALL, 5)
             self.sizer_DYNAMIC_del.Fit(self)
@@ -106,7 +104,6 @@ class DelCmdOrMod(wx.Dialog):
 
         # Получаем объект главного окна приложения
         main_obj = self.parent_dialog
-        print(f'родитель======== {main_obj}')
         # Обновляем данные в главном окне
         main_obj.update_main_window(self)
 

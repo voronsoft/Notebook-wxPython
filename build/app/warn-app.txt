@@ -53,5 +53,7 @@ missing module named 'mysql.connector' - imported by sqlalchemy.dialects.mysql.m
 missing module named mysql - imported by sqlalchemy.dialects.mysql.mysqlconnector (delayed)
 missing module named asyncmy - imported by sqlalchemy.dialects.mysql.asyncmy (delayed)
 missing module named pymysql - imported by sqlalchemy.dialects.mysql.aiomysql (delayed)
+missing module named win32evtlog - imported by logging.handlers (delayed, optional)
+missing module named win32evtlogutil - imported by logging.handlers (delayed, optional)
 missing module named Carbon - imported by wx.lib.colourutils (conditional, optional)
 missing module named StringIO - imported by six (conditional)

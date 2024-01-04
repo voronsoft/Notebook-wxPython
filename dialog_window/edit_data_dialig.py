@@ -103,7 +103,6 @@ class EditCommandOrModule(wx.Dialog):
             self.Destroy()  # Закрываем только текущее окно
         else:
             main_obj = self.parent_dialog.GetParent()
-            print('====NOT none====', main_obj)
             main_obj.update_main_window(self)
             event.Veto()
 

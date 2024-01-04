@@ -53,6 +53,9 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "{app}\db"
 Name: "{app}\html"
 Name: "{app}\icons"
+; Дополнительные директории, которые должны быть созданы во время установки программы
+Name: "{localappdata}\Notebook"
+Name: "{localappdata}\Notebook\Logs" 
 
 [Files]
 ; Все что в этих директориях в папке инсталятора будет перенесенно в папку с устанавливаемым приложением
@@ -60,6 +63,11 @@ Source: "{#MyFolder}\Source\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignorever
 Source: "{#MyFolder}\Source\db\*"; DestDir: "{app}\db"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#MyFolder}\Source\html\*"; DestDir: "{app}\html"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#MyFolder}\Source\icons\*"; DestDir: "{app}\icons"; Flags: ignoreversion recursesubdirs createallsubdirs
+; Создаем файлы для логгера
+Source: "{#MyFolder}\Source\Logs\debug.log"; DestDir: "{localappdata}\Notebook\Logs"; Flags: ignoreversion
+Source: "{#MyFolder}\Source\Logs\warning.log"; DestDir: "{localappdata}\Notebook\Logs"; Flags: ignoreversion
+Source: "{#MyFolder}\Source\Logs\error.log"; DestDir: "{localappdata}\Notebook\Logs"; Flags: ignoreversion
+
 
 [Icons]
 ; Ссылка на программу URL
