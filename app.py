@@ -202,7 +202,7 @@ class FrameMain(wx.Frame):
 
     def del_data_button_click(self, event):
         """Открытие окна Удалить данные"""
-        logger_debug.debug('Включен диалог - "Удалить данные"')
+        logger_debug.debug('Включен диалог - Удалить данные')
         del_dialog = DelCmdOrMod(self)
         del_dialog.ShowModal()
         del_dialog.Destroy()

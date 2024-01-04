@@ -1,11 +1,10 @@
 """Файл для создания БД db-notebook (sqlite3)"""
-import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from instance.app_config import path_to_DB, local_appdata
-from db.models import Base, Module, Command, CommandModuleAssociation
 from logs.app_logger import logger_debug
+from instance.app_config import path_to_DB
 from utils.creat_folder import creat_folder_app
+from db.models import Base, Module, Command, CommandModuleAssociation
 
 
 def create_database():
