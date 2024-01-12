@@ -11,6 +11,8 @@ from dialog_window.about_program_dialog import AboutProgram
 from dialog_window.statistics_dialog import StatisticDialog
 from dialog_window.add_data_dialog import AddCommandOrModule
 from dialog_window.edit_data_dialig import EditCommandOrModule
+from dialog_window.import_dialog import ImportDialog
+from dialog_window.export_dialog import ExportDialog
 from dialog_window.documentation_dialog import DocumentationDialog
 from instance.app_config import icons_folder_path, upd_db_folder_path
 from db.creat_db_and_data import create_database, added_command_data_db
@@ -116,6 +118,22 @@ class FrameMain(wx.Frame):
         logs_menu_item.SetBitmap(icon_about)
         menu_bar.Append(help_menu, "Help")
 
+        # -- Меню "Import/Export"
+        import_export_menu = wx.Menu()
+        # 1
+        import_menu_item = import_export_menu.Append(wx.ID_ANY, "Import", "Загрузить данные из файла")
+        self.Bind(wx.EVT_MENU, self.show_import, import_menu_item)
+        # Загружаем иконку и связываем с пунктом
+        icon_import = wx.Bitmap(os.path.join(icons_folder_path, "import16.png"), wx.BITMAP_TYPE_PNG)
+        import_menu_item.SetBitmap(icon_import)
+        # 2
+        export_menu_item = import_export_menu.Append(wx.ID_ANY, "Export", "Выгрузить данные из программы в файл")
+        self.Bind(wx.EVT_MENU, self.show_export, export_menu_item)
+        # Загружаем иконку и связываем с пунктом
+        icon_export = wx.Bitmap(os.path.join(icons_folder_path, "export16.png"), wx.BITMAP_TYPE_PNG)
+        export_menu_item.SetBitmap(icon_export)
+        menu_bar.Append(import_export_menu, "Import/Export")
+
         self.SetMenuBar(menu_bar)  # Устанавливаем созданное меню
         #  ---------------------- END Системное меню  ----------------------
 
@@ -186,12 +204,13 @@ class FrameMain(wx.Frame):
 
         self.Maximize()  # Максимизируем окно на весь экран
 
-        # События для кнопок
+        # События
         self.add_button_data.Bind(wx.EVT_LEFT_DOWN, self.add_data_button_click)  # Добавить
         self.edit_button_data.Bind(wx.EVT_LEFT_DOWN, self.edit_data_button_click)  # Изменить
         self.del_button_data.Bind(wx.EVT_LEFT_DOWN, self.del_data_button_click)  # Удалить
         self.search_button.Bind(wx.EVT_LEFT_DOWN, self.search)  # Поиск
         self.close_button.Bind(wx.EVT_BUTTON, self.close_program)  # Закрыть программу
+        self.Bind(wx.EVT_CLOSE, self.close_program)  # Закрытие программы нажатие значка верхний правый угол
         self.upd_szr_data_button.Bind(wx.EVT_BUTTON, self.update_main_window)  # Обновить данные в сайзере DATA
         # Обновить центральный сайзер ()
 
@@ -247,6 +266,11 @@ class FrameMain(wx.Frame):
         except Exception as e:
             logger_debug.exception(f'Ошибка при обновлении консоли приложения: {e}')
 
+    def close_program(self, event):
+        """Закрытие программы"""
+        logger_debug.debug("Программа закрыта !!")
+        self.Destroy()
+
     # ----------------  Обработчики событий для пунктов системного меню ----------------
     def show_documentation(self, event):
         """Открытие диалога документации"""
@@ -272,10 +296,6 @@ class FrameMain(wx.Frame):
         dialog = LoggingDialog(self)
         dialog.ShowModal()
         dialog.Destroy()
-
-    def close_program(self, event):
-        """Закрытие программы кнопка - Выход"""
-        self.Destroy()
 
     def load_bd_python(self, event):
         """Загрузка БД для Python"""
@@ -303,6 +323,20 @@ class FrameMain(wx.Frame):
         clear_database()  # Очищаем БД
         self.update_main_window(None)  # Обновляем интерфейс
         del info
+
+    def show_import(self, event):
+        """Отображение панели Импорта"""
+        dialog_import = ImportDialog(self)
+        logger_debug.debug("Открыт диалог Импорт")
+        dialog_import.ShowModal()
+        dialog_import.Destroy()
+
+    def show_export(self, event):
+        """Отображение панели Экспорта"""
+        dialog_export = ExportDialog(self)
+        logger_debug.debug("Открыт диалог Экспорт")
+        dialog_export.ShowModal()
+        dialog_export.Destroy()
 
     # ------------------------------------- END системное меню----------------------------------------
 
