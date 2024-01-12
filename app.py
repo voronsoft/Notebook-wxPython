@@ -3,6 +3,8 @@ import wx
 import wx.xrc
 from logs.app_logger import logger_debug
 from utils.database_queries import clear_database
+from dialog_window.import_dialog import ImportDialog
+from dialog_window.export_dialog import ExportDialog
 from dialog_window.search_dialog import SearchDialog
 from dialog_window.del_data_dialog import DelCmdOrMod
 from dialog_window.logging_dialog import LoggingDialog
@@ -11,8 +13,6 @@ from dialog_window.about_program_dialog import AboutProgram
 from dialog_window.statistics_dialog import StatisticDialog
 from dialog_window.add_data_dialog import AddCommandOrModule
 from dialog_window.edit_data_dialig import EditCommandOrModule
-from dialog_window.import_dialog import ImportDialog
-from dialog_window.export_dialog import ExportDialog
 from dialog_window.documentation_dialog import DocumentationDialog
 from instance.app_config import icons_folder_path, upd_db_folder_path
 from db.creat_db_and_data import create_database, added_command_data_db
