@@ -1,7 +1,6 @@
 import os
 import wx
 import wx.xrc
-
 from instance.app_config import icons_folder_path
 
 
@@ -16,13 +15,16 @@ class ExportDialog(wx.Dialog):
 
         self.SetSizeHints(wx.DefaultSize, wx.DefaultSize)
         self.SetFont(wx.Font(12, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
+        # Устанавливаем иконку для окна
+        icon = wx.Icon(f'{os.path.join(icons_folder_path, "notebook.ico")}', wx.BITMAP_TYPE_ICO)
+        self.SetIcon(icon)
 
         sizer_main = wx.BoxSizer(wx.VERTICAL)
 
         sizer_main.SetMinSize(wx.Size(600, 600))
         sizer_top = wx.BoxSizer(wx.VERTICAL)
 
-        self.m_staticText6 = wx.StaticText(self, wx.ID_ANY, "Экспортировать данные в файла", wx.DefaultPosition, wx.DefaultSize, 0)
+        self.m_staticText6 = wx.StaticText(self, wx.ID_ANY, "Экспортировать данные в файл", wx.DefaultPosition, wx.DefaultSize, 0)
         self.m_staticText6.Wrap(-1)
 
         self.m_staticText6.SetFont(wx.Font(14, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
@@ -62,9 +64,7 @@ class ExportDialog(wx.Dialog):
         # Connect Events
         self.apply_btn.Bind(wx.EVT_BUTTON, self.apply_btn_handler)
 
-    def __del__(self):
-        pass
-
-    # Virtual event handlers, override them in your derived class
+    # ---------------- Обработчики событий---------------
     def apply_btn_handler(self, event):
+        """"""
         event.Skip()

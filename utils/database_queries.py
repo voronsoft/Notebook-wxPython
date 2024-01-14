@@ -1,3 +1,5 @@
+import json
+
 from db.models import Module, Command
 from sqlalchemy.orm import sessionmaker
 from instance.app_config import path_to_DB
@@ -340,3 +342,79 @@ def clear_database():
             logger_debug.exception(f'Ошибка при удалении данных из БД: {e}')
             session.rollback()  # Откатываем изменения в случае ошибки
             return 'error'
+
+
+# Функция экспорта данных в файл типа .json
+def import_data_json_from_db(path_file_json_data, gauge):
+    """Функция экспорта данных в файл типа .json"""
+    import wx
+    if path_file_json_data:
+        with Session() as session:
+            try:
+                # Открываем файл JSON и загружаем данные
+                with open(path_file_json_data, 'r', encoding='utf-8') as json_file:
+                    data = json.load(json_file)
+                    total_entries = len(data)
+
+                    # Устанавливаем максимальное значение прогресс-бара
+                    gauge.SetRange(total_entries)
+
+                    # Счетчик добавленных команд
+                    added_commands = 0
+
+                    # Импортируем данные в базу данных
+                    for idx, entry in enumerate(data, start=1):
+                        module_name = entry['module_name']
+                        command_name = entry['command_name']
+
+                        # Проверяем, существует ли команда с таким именем
+                        command = session.query(Command).filter_by(command_name=command_name).first()
+                        if not command:
+                            # Если команда не существует, создаем новую
+                            command = Command(
+                                command_name=command_name,
+                                description=entry['command_description'],
+                                example=entry['command_example'],
+                            )
+                            session.add(command)  # Сохраняем команду, чтобы получить ей ID
+                            session.commit()
+
+                            # Проверяем, существует ли модуль с таким именем
+                            module = session.query(Module).filter_by(module_name=module_name).first()
+                            if not module:
+                                module = Module(
+                                    module_name=module_name,
+                                    description='',
+                                )
+                                session.add(module)  # Сохраняем модуль, чтобы получить ему ID
+                                session.commit()
+
+                            # Создаем связь команды с модулем
+                            module.commands.append(command)
+                            command.modules.append(module)
+                            # Сохраняем изменения
+                            session.commit()
+
+                            # Увеличиваем счетчик добавленных команд для прогрес бара
+                            added_commands += 1
+
+                        # Устанавливаем текущее значение прогресс-бара
+                        gauge.SetValue(added_commands)
+                        wx.Yield()  # Позволяет интерфейсу обновиться
+
+            except Exception as e:
+                # Ошибка при импорте данных
+                logger_debug.exception(f'Ошибка при импорте данных в БД из файла json: {e}')
+                session.rollback()  # Откатываем изменения в случае ошибки
+                return False
+        return True
+    else:
+        logger_debug.warning("Импорт данных отменён. Путь к файлу json указан неверно.")
+
+
+def export_data_db_from_json(module=None):
+    """Функция экспорта данных в файл типа .json"""
+    if module:
+        ...
+    else:
+        ...
