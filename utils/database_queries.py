@@ -55,6 +55,23 @@ def request_get_module(name_mod_str):
             return 'error'
 
 
+# Функция получение количества модулей из БД.
+def get_module_count():
+    """Получение количества модулей из БД."""
+    with Session() as session:
+        try:
+            # Выполняем запрос для подсчета количества модулей
+            module_count = session.query(Module).count()
+
+            # Возвращаем количество модулей
+            return module_count
+
+        except Exception as e:
+            # Обрабатываем возможные ошибки, например, выводим сообщение об ошибке
+            logger_debug.exception(f"Ошибка при получении количества модулей: {e}")
+            return 0  # Если произошла ошибка, возвращаем 0
+
+
 # Функция получение списка команд исходя из названия модуля (modul_name)
 def request_get_commands(modul_name):
     """
@@ -100,7 +117,7 @@ def count_commands_in_module(module_name):
             return 0
 
 
-# Функция для выполнения запроса для получения данных о конкретной команде
+# Функция для выполнения запроса получения данных о конкретной команде
 def show_full_command_info(command_name=None):
     """
     Получение полной информации о команде из БД
@@ -344,9 +361,9 @@ def clear_database():
             return 'error'
 
 
-# Функция экспорта данных в файл типа .json
+# Функция импорте данных в файл типа .json
 def import_data_json_from_db(path_file_json_data, gauge):
-    """Функция экспорта данных в файл типа .json"""
+    """Функция импорте данных в файл типа .json"""
     import wx
     if path_file_json_data:
         with Session() as session:
@@ -412,6 +429,7 @@ def import_data_json_from_db(path_file_json_data, gauge):
         logger_debug.warning("Импорт данных отменён. Путь к файлу json указан неверно.")
 
 
+# Функция экспорта данных в файл типа .json
 def export_data_db_from_json(module=None):
     """Функция экспорта данных в файл типа .json"""
     if module:

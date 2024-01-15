@@ -34,9 +34,6 @@ class PanelCenter(wx.Panel):
             # Запускаем загрузку команд для активной вкладки
             name_first_tb = self.notebook.GetPageText(0)
             self.add_cmd_to_tab(first_tab, name_first_tb)
-        else:
-            # Если БД пустая открываем окно документации.
-            wx.CallAfter(self.if_not_module)
 
         # Привязываем событие выбора вкладки
         self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.on_page_changed, self.notebook)
@@ -45,12 +42,6 @@ class PanelCenter(wx.Panel):
         self.Layout()
 
     # ---------------- Обработчики событий---------------
-    def if_not_module(self):
-        """Функция открытия страницы документации"""
-        start_dialog_doc = documentation_dialog.DocumentationDialog(self)
-        start_dialog_doc.ShowModal()
-        start_dialog_doc.Destroy()
-
     def add_tabs(self):
         """Функция для добавления вкладок в notebook"""
         # Получаем список объектов модулей из Бд
@@ -254,33 +245,3 @@ class TabModule(wx.Panel):
 
         self.SetSizer(sizer_main_tab)
         self.Layout()
-
-
-###########################################################################
-# Class LoadData
-###########################################################################
-class LoadData(wx.Dialog):
-
-    def __init__(self, parent):
-        wx.Dialog.__init__(self, parent, id=wx.ID_ANY, title=wx.EmptyString, pos=wx.DefaultPosition, size=wx.Size(350, 100), style=0)
-
-        self.SetSizeHints(wx.DefaultSize, wx.DefaultSize)
-
-        main_sizer = wx.BoxSizer(wx.VERTICAL)
-
-        main_sizer.SetMinSize(wx.Size(350, -1))
-        self.load = wx.StaticText(self, wx.ID_ANY, "Загрузка ...", wx.DefaultPosition, wx.DefaultSize, 0)
-        self.load.Wrap(-1)
-
-        self.load.SetFont(wx.Font(12, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
-
-        main_sizer.Add(self.load, 0, wx.ALIGN_CENTER | wx.ALL, 15)
-
-        self.m_gauge1 = wx.Gauge(self, wx.ID_ANY, 100, wx.DefaultPosition, wx.DefaultSize, wx.GA_HORIZONTAL)
-        self.m_gauge1.SetValue(100)
-        main_sizer.Add(self.m_gauge1, 0, wx.ALL | wx.EXPAND, 5)
-
-        self.SetSizer(main_sizer)
-        self.Layout()
-
-        self.Centre(wx.BOTH)

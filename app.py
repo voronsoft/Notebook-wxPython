@@ -2,7 +2,7 @@ import os
 import wx
 import wx.xrc
 from logs.app_logger import logger_debug
-from utils.database_queries import clear_database
+from dialog_window import documentation_dialog
 from dialog_window.import_dialog import ImportDialog
 from dialog_window.export_dialog import ExportDialog
 from dialog_window.search_dialog import SearchDialog
@@ -14,6 +14,7 @@ from dialog_window.statistics_dialog import StatisticDialog
 from dialog_window.add_data_dialog import AddCommandOrModule
 from dialog_window.edit_data_dialig import EditCommandOrModule
 from dialog_window.documentation_dialog import DocumentationDialog
+from utils.database_queries import clear_database, get_module_count
 from instance.app_config import icons_folder_path, upd_db_folder_path
 from db.creat_db_and_data import create_database, added_command_data_db
 
@@ -172,10 +173,21 @@ class FrameMain(wx.Frame):
 
         # -----------------------------------------------------------
         # Сайзер - DATA (основное размещение данных из бд)
-        sizer_data = wx.BoxSizer(wx.VERTICAL)
-        panel_center = PanelCenter(self)  # Экземпляр класса PanelCenter (данные из бд в основном сайзере DATA)
-        sizer_data.Add(panel_center, 0, wx.EXPAND, 5)  # Добавляем в сайзер DATA экземпляр класса PanelCenter
-        sizerMain.Add(sizer_data, 1, wx.EXPAND, 5)  # Добавляем в сайзер MAIN сайзер DATA
+        # Если в БД есть данные о модулях загружаем главную панель
+        if get_module_count() > 0:
+            sizer_data = wx.BoxSizer(wx.VERTICAL)
+            panel_center = PanelCenter(self)  # Экземпляр класса PanelCenter (данные из бд в основном сайзере DATA)
+            sizer_data.Add(panel_center, 0, wx.EXPAND, 5)  # Добавляем в сайзер DATA экземпляр класса PanelCenter
+            sizerMain.Add(sizer_data, 1, wx.EXPAND, 5)  # Добавляем в сайзер MAIN сайзер DATA
+
+        # Если данных нет то загружаем панель документации
+        elif get_module_count() == 0:
+            print('Загружаем документацию')
+            sizer_data = wx.BoxSizer(wx.VERTICAL)
+            start_dialog_doc = documentation_dialog.DocumentationPanel(self)
+            sizer_data.Add(start_dialog_doc, 0, wx.EXPAND, 5)
+            sizerMain.Add(sizer_data, 1, wx.EXPAND, 5)
+
         # -----------------------------------------------------------
 
         # Сайзер - BOTTOM
@@ -253,10 +265,16 @@ class FrameMain(wx.Frame):
             for item in sizer_data.GetChildren():
                 item.GetWindow().Destroy()
 
-            # Создаем новый экземпляр класса PanelCenter
-            new_panel_center = PanelCenter(self)
-            # Добавляем новый экземпляр в сайзер sizer_data
-            sizer_data.Add(new_panel_center, 1, wx.EXPAND, 5)
+            if get_module_count() > 0:
+                # Создаем новый экземпляр класса PanelCenter
+                new_panel_center = PanelCenter(self)
+                # Добавляем новый экземпляр в сайзер sizer_data
+                sizer_data.Add(new_panel_center, 1, wx.EXPAND, 5)
+
+            # Если данных нет то загружаем панель документации
+            elif get_module_count() == 0:
+                start_dialog_doc = documentation_dialog.DocumentationPanel(self)
+                sizer_data.Add(start_dialog_doc, 0, wx.EXPAND, 5)
 
             # Обновляем отображение
             self.Layout()
@@ -275,7 +293,6 @@ class FrameMain(wx.Frame):
     def show_documentation(self, event):
         """Открытие диалога документации"""
         dialog_doc = DocumentationDialog(self)
-        # dialog_doc.Show()  # Откроет окно как независимую единицу
         dialog_doc.ShowModal()
         dialog_doc.Destroy()
 
