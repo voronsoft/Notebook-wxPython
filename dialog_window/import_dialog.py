@@ -53,11 +53,9 @@ class ImportDialog(wx.Dialog):
         self.line = wx.StaticLine(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL)
         sizer_main.Add(self.line, 0, wx.EXPAND | wx.ALL, 5)
 
-        # Создайте gauge в вашем коде (например, внутри вашего окна)
-        # self.gauge = wx.Gauge(parent, wx.ID_ANY, range=1, size=(250, 25), style=wx.GA_HORIZONTAL)
-
+        # Поле статус бара
         self.gauge = wx.Gauge(self, wx.ID_ANY, 1, wx.DefaultPosition, wx.DefaultSize, wx.GA_HORIZONTAL)
-        self.gauge.SetValue(0)
+        self.gauge.SetValue(0)  # Задаём начальное значение строке статус бара
         sizer_main.Add(self.gauge, 0, wx.ALL | wx.EXPAND, 5)
 
         # Поле вывода импортируемых данных
@@ -91,9 +89,9 @@ class ImportDialog(wx.Dialog):
 
         self.Centre(wx.BOTH)
 
-        # События
-        self.choice_file.Bind(wx.EVT_FILEPICKER_CHANGED, self.on_file_selected)
-        self.apply_btn.Bind(wx.EVT_BUTTON, self.apply_btn_handler_import_data)
+        # ------------ События --------------
+        self.choice_file.Bind(wx.EVT_FILEPICKER_CHANGED, self.on_file_selected)  # Событие выбора файла
+        self.apply_btn.Bind(wx.EVT_BUTTON, self.apply_btn_handler_import_data)  # Событие для кнопки - Импортировать
 
     # ---------------- Обработчики событий---------------
     def on_file_selected(self, event):

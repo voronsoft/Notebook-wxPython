@@ -92,18 +92,9 @@ class AddCommandOrModule(wx.Dialog):
     # Обработчик события закрытия окна
     def on_close_dialog(self, event):
         """Закрытие диалогового окна"""
-        # Отображаем диалоговое окно с сообщением
-        message = f"После закрытия окна основной интерфейс будет обновлен\nс учетом добавленных данных."
-        wx.MessageBox(message, "Оповещение", wx.OK | wx.ICON_INFORMATION)
-
         # Вызываем стандартное событие закрытия окна
         self.Destroy()
         event.Skip()
-
-        # Получаем объект главного окна приложения
-        main_obj = self.parent_dialog
-        # Обновляем данные в главном окне
-        main_obj.update_main_window(self)
 
 
 ###########################################################################
@@ -114,6 +105,9 @@ class PanelAddCommand(wx.Panel):
 
     def __init__(self, parent, id=wx.ID_ANY, pos=wx.DefaultPosition, size=wx.Size(-1, -1), style=wx.NO_FULL_REPAINT_ON_RESIZE | wx.TAB_TRAVERSAL | wx.WANTS_CHARS, name=wx.EmptyString):
         wx.Panel.__init__(self, parent, id=id, pos=pos, size=size, style=style, name=name)
+
+        self.parent_dialog = self.GetParent()  # Родитель окна
+
         # Главный сайзер панели
         sizer_main_panel_cmd = wx.BoxSizer(wx.VERTICAL)
         sizer_main_panel_cmd.SetMinSize(wx.Size(600, 600))
@@ -173,7 +167,6 @@ class PanelAddCommand(wx.Panel):
         self.Layout()
         sizer_main_panel_cmd.Fit(self)
 
-    # TODO добавить обновление интерфейса главного окна, после закрытия окна !!!
     # --------------Обработчики событий --------------
     def on_btn_apply(self, event):
         """"Добавление команды в БД"""
@@ -202,11 +195,14 @@ class PanelAddCommand(wx.Panel):
                     self.cmd_description_data.Clear()
                     self.cmd_example_data.Clear()
                     self.choice_module_data.SetSelection(-1)
+                    # Получаем объект главного окна приложения
+                    main_obj_window = self.GetParent().GetParent()
+                    # Обновляем данные в главном окне)
+                    main_obj_window.update_main_window(self)
                 elif result == 'error':
                     # Оповещение
                     message = f"Ошибка при добавлении команды: '{name_cmd_new}'\nПовторите попытку."
                     wx.MessageBox(message, "Ошибка", wx.OK | wx.ICON_ERROR)
-                    # Очищаем поля
                 else:
                     message = f"Команда: '{name_cmd_new}'\nУже есть в БД."
                     wx.MessageBox(message, "Найдено совпадение", wx.OK | wx.ICON_WARNING)
@@ -225,6 +221,9 @@ class PanelAddModule(wx.Panel):
 
     def __init__(self, parent, id=wx.ID_ANY, pos=wx.DefaultPosition, size=wx.Size(-1, -1), style=wx.TAB_TRAVERSAL, name=wx.EmptyString):
         wx.Panel.__init__(self, parent, id=id, pos=pos, size=size, style=style, name=name)
+
+        self.parent_dialog = self.GetParent()  # Родитель окна
+
         # Сайзер основной
         sizer_main_panel_mod = wx.BoxSizer(wx.VERTICAL)
         sizer_main_panel_mod.SetMinSize(wx.Size(600, 600))
@@ -269,7 +268,6 @@ class PanelAddModule(wx.Panel):
     # --------------Обработчики событий --------------
     def on_btn_apply(self, event):
         """"Добавление модуля в БД"""
-        # TODO добавить обновление интерфейса главного окна, после закрытия окна !!!
         name_mod = self.mod_data_name.GetValue()  # Получаем Название
         descr_mod = self.mod_description_data.GetValue()  # Получаем описание
 
@@ -278,11 +276,16 @@ class PanelAddModule(wx.Panel):
             answer = database_queries.add_module(name_mod, descr_mod)
             if answer:
                 # Оповещение
-                message = f"Новый модуль '{name_mod}'добавлен в БД"
+                message = f"Новый модуль '{name_mod}' добавлен в БД"
                 wx.MessageBox(message, "Оповещение", wx.OK | wx.ICON_INFORMATION)
                 # Очищаем поля
                 self.mod_data_name.Clear()
                 self.mod_description_data.Clear()
+                # Получаем объект главного окна приложения
+                main_obj_window = self.GetParent().GetParent()
+                # Обновляем данные в главном окне)
+                main_obj_window.update_main_window(self)
+
             elif answer == 'error':
                 # Оповещение
                 message = f"Ошибка при добавлении модуля: '{name_mod}'\nПовторите попытку."

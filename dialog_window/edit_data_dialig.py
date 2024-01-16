@@ -92,19 +92,8 @@ class EditCommandOrModule(wx.Dialog):
     # Обработчик события закрытия окна
     def on_close_dialog(self, event):
         """Закрытие диалогового окна"""
-        # Отображаем диалоговое окно с сообщением
-        message = f"После закрытия окна основной интерфейс будет обновлен."
-        wx.MessageBox(message, "Оповещение", wx.OK | wx.ICON_INFORMATION)
-
-        # Обновляем данные в главном окне
-        if self.GetParent().GetParent() is None:
-            main_obj = self.GetParent()  # Родитель окна
-            main_obj.update_main_window(None)
-            self.Destroy()  # Закрываем только текущее окно
-        else:
-            main_obj = self.parent_dialog.GetParent()
-            main_obj.update_main_window(self)
-            event.Veto()
+        self.Destroy()
+        event.Skip()
 
 
 ###########################################################################
@@ -115,6 +104,9 @@ class PanelEditModule(wx.Panel):
 
     def __init__(self, parent, id=wx.ID_ANY, pos=wx.DefaultPosition, size=wx.Size(-1, -1), style=0, name="Удалить МОДУЛЬ"):
         wx.Panel.__init__(self, parent, id=id, pos=pos, size=size, style=style, name=name)
+
+        self.parent_dialog = self.GetParent()  # Родитель окна
+
         # Главный сайзер
         sizer_main_panel_edit_mod = wx.BoxSizer(wx.VERTICAL)
         sizer_main_panel_edit_mod.SetMinSize(wx.Size(600, 600))
@@ -129,7 +121,7 @@ class PanelEditModule(wx.Panel):
         self.lst_mod_obj = database_queries.request_to_get_all_modules()
         choice_modChoices = [mod_item['module_name'] for mod_item in self.lst_mod_obj]  # Получаем список модулей
         self.choice_mod = wx.Choice(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, choice_modChoices, 0)
-        self.choice_mod.SetForegroundColour(wx.Colour(255, 0, 0))  # RGB цвет для красного
+        self.choice_mod.SetForegroundColour(wx.Colour(255, 0, 0))  # RGB цвет красный
         self.choice_mod.SetSelection(-1)
         sizer_data.Add(self.choice_mod, 0, wx.ALL | wx.EXPAND, 5)
         #
@@ -191,6 +183,11 @@ class PanelEditModule(wx.Panel):
             self.choice_mod.SetSelection(-1)
             self.Layout()
 
+            # Получаем объект главного окна приложения
+            main_obj_window = self.GetParent().GetParent()
+            # Обновляем данные в главном окне)
+            main_obj_window.update_main_window(self)
+
         elif result == 'error':
             # Оповещение
             message = f"Ошибка при изменении модуля: '{select_mod_name}'\nПовторите попытку."
@@ -233,6 +230,8 @@ class PanelEditCommand(wx.Panel):
 
     def __init__(self, parent, id=wx.ID_ANY, pos=wx.DefaultPosition, size=wx.Size(-1, -1), style=wx.TAB_TRAVERSAL, name=wx.EmptyString):
         wx.Panel.__init__(self, parent, id=id, pos=pos, size=size, style=style, name=name)
+
+        self.parent_dialog = self.GetParent()  # Родитель окна
 
         # Главный сайзер
         sizer_main_panel_edit_cmd = wx.BoxSizer(wx.VERTICAL)
@@ -327,7 +326,6 @@ class PanelEditCommand(wx.Panel):
         self.choice_cmd.Bind(wx.EVT_CHOICE, self.on_cmd_select)
 
         # Привязываем событие для кнопки - "Применить", передаем данные в обработчик
-
         self.button_apply.Bind(wx.EVT_BUTTON, self.on_btn_apply)
 
         self.SetSizer(sizer_main_panel_edit_cmd)
@@ -387,6 +385,10 @@ class PanelEditCommand(wx.Panel):
             self.new_name_inp_text.Clear()
             self.descr_inp_text.Clear()
             self.exampl_inp_text.Clear()
+            # Получаем объект главного окна приложения
+            main_obj_window = self.GetParent().GetParent()
+            # Обновляем данные в главном окне)
+            main_obj_window.update_main_window(self)
 
             event.Skip()
 

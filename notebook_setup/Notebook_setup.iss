@@ -54,9 +54,21 @@ Name: "{app}\db"
 Name: "{app}\img"
 Name: "{app}\icons"
 ; Дополнительные директории, которые должны быть созданы во время установки программы
-; Указана папка AppData 
+; Указана папка AppData - {localappdata} 
 Name: "{localappdata}\Notebook"
-Name: "{localappdata}\Notebook\Logs" 
+Name: "{localappdata}\Notebook\Logs"
+; Указана папка Documents - {userdocs}
+Name: "{userdocs}\Notebook-export-json"
+
+[UninstallDelete]
+; Удалить все файлы и директории при деинсталляции программы
+
+Type: filesandordirs; Name: "{app}\db"
+Type: filesandordirs; Name: "{app}\img"
+Type: filesandordirs; Name: "{app}\icons"
+Type: filesandordirs; Name: "{app}"
+Type: filesandordirs; Name: "{localappdata}\Notebook"
+Type: filesandordirs; Name: "{userdocs}\Notebook-export-json"
 
 [Files]
 ; Все что в этих директориях в папке инсталятора будет перенесенно в папку с устанавливаемым приложением

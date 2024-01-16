@@ -1,11 +1,11 @@
+import os
+import wx
 import json
-
 from db.models import Module, Command
 from sqlalchemy.orm import sessionmaker
+from logs.app_logger import logger_debug
 from instance.app_config import path_to_DB
 from sqlalchemy import create_engine, func, inspect, text
-
-from logs.app_logger import logger_debug
 
 # Строим путь к файлу базы данных
 engine = create_engine(f'sqlite:///{path_to_DB}', echo=False)  # Создаем соединение с базой данных echo=False отключит вывод запросов в консоль
@@ -55,7 +55,7 @@ def request_get_module(name_mod_str):
             return 'error'
 
 
-# Функция получение количества модулей из БД.
+# Функция получение КОЛИЧЕСТВА модулей из БД.
 def get_module_count():
     """Получение количества модулей из БД."""
     with Session() as session:
@@ -81,7 +81,6 @@ def request_get_commands(modul_name):
     """
     with Session() as session:
         try:
-            # Если modul_name задан, фильтруем команды по ассоциированным модулям
             commands = session.query(Command).join(Command.modules).filter(Module.module_name == modul_name).all()
             # Преобразуем результат в список словарей для удобства использования
             commands_data = []
@@ -97,7 +96,7 @@ def request_get_commands(modul_name):
             return commands_data
 
         except Exception as e:
-            # Обрабатываем возможные ошибки, например, выводим сообщение об ошибке
+            # Обрабатываем возможные ошибки.
             logger_debug.exception(f"Ошибка при получении списка команд: {e}")
             return []
 
@@ -361,8 +360,8 @@ def clear_database():
             return 'error'
 
 
-# Функция импорте данных в файл типа .json
-def import_data_json_from_db(path_file_json_data, gauge):
+# Функция ИМПОРТА данных в файл типа .json
+def import_data_json_from_db(path_file_json_data, gauge=None):
     """Функция импорте данных в файл типа .json"""
     import wx
     if path_file_json_data:
@@ -429,10 +428,148 @@ def import_data_json_from_db(path_file_json_data, gauge):
         logger_debug.warning("Импорт данных отменён. Путь к файлу json указан неверно.")
 
 
-# Функция экспорта данных в файл типа .json
-def export_data_db_from_json(module=None):
+# Функция ЭКСПОРТА данных в файл типа .json
+def export_data_db_to_json_file(name_text_module=None, gauge=None):
     """Функция экспорта данных в файл типа .json"""
-    if module:
-        ...
+    # Счетчик добавленных команд для прогресс бара
+    added_commands = 0
+
+    # --------------- Если в функцию был передан модуль формируем json файл с записями для модуля---------------
+    if name_text_module:
+        with Session() as session:
+            try:
+                lst_cmd_module = request_get_commands(name_text_module)
+                # Создаем список для хранения словарей
+                updated_commands_list = []
+                # Устанавливаем максимальное значение для прогрес бара
+                total_entries = len(lst_cmd_module)
+                gauge.SetRange(total_entries)
+
+                # Проходим по каждой команде
+                for cmd in lst_cmd_module:
+                    # Преобразуем запись в словарь с необходимыми полями
+                    # с учетом, что файл в последующем может быть так же
+                    # импортирован в программу
+                    cmd_dict = {
+                        'module_name': cmd['cmd_assoc_module'][0],
+                        'command_name': cmd['commands_name'],
+                        'command_description': cmd['description_command'],
+                        'command_example': cmd['command_example:']
+                    }
+                    # Добавляем обновленный словарь в список
+                    updated_commands_list.append(cmd_dict)
+                    # Увеличиваем счетчик добавленных команд для прогрес бара
+                    added_commands += 1
+                    # Устанавливаем текущее значение прогрес бара
+                    gauge.SetValue(added_commands)
+                    wx.Yield()  # Позволяет интерфейсу обновиться
+
+                # Экспортируем в JSON с более читабельным форматированием (используем - ensure_ascii=False)
+                json_data = json.dumps(updated_commands_list, ensure_ascii=False, indent=4)
+                logger_debug.debug(f"Объект JSON успешно сформирован (json_data), приступаем к записи данных в файл.")
+            except Exception as json_error:
+                # Оповещение
+                message = f"Произошла ошибка при формировании JSON объекта:\n{json_error}"
+                wx.MessageBox(message, "Оповещение", wx.OK | wx.ICON_INFORMATION)
+                # Обработка ошибок при формировании JSON
+                logger_debug.exception(f"Произошла ошибка при формировании JSON объекта: {json_error}")
+                return 'error'
+
+            if json_data:
+                print(json_data)
+                try:
+                    # Определяем путь для сохранения файла по пути в операционной системе - C:\Users\user\Documents\Notebook-export-json\all_data.json
+                    file_path = os.path.join(os.path.expanduser('~'), 'Documents', 'Notebook-export-json', f'{name_text_module}.json')
+
+                    # Проверяем и создаем директорию, если она не существует
+                    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+
+                    # Записываем данные в файл
+                    with open(file_path, 'w', encoding='utf-8') as json_file:
+                        json_file.write(json_data)
+                        logger_debug.debug(f"Был создан файл 'Notebook_DB.json', по пути: {file_path}")
+
+                    # Оповещение
+                    message = f"Данные успешно экспортированы в файл: {name_text_module}.json.\nПуть к файлу: {file_path}"
+                    wx.MessageBox(message, "Оповещение", wx.OK | wx.ICON_INFORMATION)
+                    gauge.SetValue(0)  # Обнуляем шкалу прогресс бара
+                except Exception as file_error:
+                    # Оповещение
+                    message = f"Произошла ошибка при создании и записи файла 'Notebook_DB.json':\n{file_error}"
+                    wx.MessageBox(message, "Оповещение", wx.OK | wx.ICON_INFORMATION)
+                    gauge.SetValue(0)  # Обнуляем шкалу прогресс бара
+                    # Обработка ошибок при записи в файл
+                    logger_debug.exception(f"Произошла ошибка при создании и записи файла 'Notebook_DB.json':\n {file_error}")
+                    return 'error'
+
+    # --------------- Если в функцию ничего не передали формируем json файл с записями Всей БД---------------
     else:
-        ...
+        with Session() as session:
+            try:
+                # Получаем все записи из таблицы
+                all_commands = session.query(Command).all()
+                # Создаем список для хранения словарей
+                updated_commands_list = []
+
+                # Устанавливаем максимальное значение для прогресс-бара
+                total_entries = len(all_commands)
+                gauge.SetRange(total_entries)
+
+                # Проходим по каждой команде
+                for cmd in all_commands:
+                    # Получаем связанные модули
+                    associated_modules = str(*[module.module_name for module in cmd.modules])
+
+                    # Преобразуем запись в словарь с необходимыми полями
+                    # с учетом, что файл в последующем может быть так же
+                    # импортирован в программу
+                    cmd_dict = {
+                        'module_name': associated_modules,
+                        'command_name': cmd.command_name,
+                        'command_description': cmd.description,
+                        'command_example': cmd.example
+                    }
+                    # Добавляем обновленный словарь в список
+                    updated_commands_list.append(cmd_dict)
+                    # Увеличиваем счетчик добавленных команд для прогрес бара
+                    added_commands += 1
+                    # Устанавливаем текущее значение прогрес бара
+                    gauge.SetValue(added_commands)
+                    wx.Yield()  # Позволяет интерфейсу обновиться
+
+                # Экспортируем в JSON с более читабельным форматированием (используем - ensure_ascii=False)
+                json_data = json.dumps(updated_commands_list, ensure_ascii=False, indent=4)
+            except Exception as json_error:
+                # Оповещение
+                message = f"Произошла ошибка при формировании объекта JSON:\n{json_error}"
+                wx.MessageBox(message, "Оповещение", wx.OK | wx.ICON_INFORMATION)
+                # Обработка ошибок при формировании JSON
+                logger_debug.exception(f"Произошла ошибка при формировании JSON: {json_error}")
+                return 'error'
+
+            if json_data:
+                try:
+                    # Определяем путь для сохранения файла по пути в операционной системе - C:\Users\user\Documents\Notebook-export-json\Notebook_DB.json
+                    file_path = os.path.join(os.path.expanduser('~'), 'Documents', 'Notebook-export-json', 'Notebook_DB.json')
+
+                    # Проверяем и создаем директорию, если она не существует
+                    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+
+                    # Записываем данные в файл
+                    with open(file_path, 'w', encoding='utf-8') as json_file:
+                        json_file.write(json_data)
+                        logger_debug.debug(f"Был создан файл 'Notebook_DB.json', по пути: {file_path}")
+
+                    # Оповещение
+                    message = f"Данные успешно экспортированы в файл: 'Notebook_DB.json'.\nПуть к файлу: {file_path}"
+                    wx.MessageBox(message, "Оповещение", wx.OK | wx.ICON_INFORMATION)
+                    gauge.SetValue(0)  # Обнуляем шкалу прогресс бара
+                except Exception as file_error:
+                    # Оповещение
+                    message = f"Произошла ошибка при создании и записи файла 'Notebook_DB.json':\n{file_error}"
+                    wx.MessageBox(message, "Оповещение", wx.OK | wx.ICON_INFORMATION)
+                    gauge.SetValue(0)
+                    # Обработка ошибок при записи в файл
+                    print(f"Произошла ошибка при записи в файл: {file_error}")
+                    logger_debug.exception(f"Произошла ошибка при создании и записи файла 'Notebook_DB.json':\n {file_error}")
+                    return 'error'

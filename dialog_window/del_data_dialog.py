@@ -55,6 +55,7 @@ class DelCmdOrMod(wx.Dialog):
         # или удалить команду - Class PanelDelCommand
         self.sizer_DYNAMIC_del = wx.BoxSizer(wx.VERTICAL)
         # ================== Заглушка ===================
+        #
         # ================ END Заглушка =================
         self.sizer_main_dialog.Add(self.sizer_DYNAMIC_del, 1, wx.EXPAND, 5)
 
@@ -94,18 +95,18 @@ class DelCmdOrMod(wx.Dialog):
     # Обработчик события закрытия окна
     def on_close_dialog(self, event):
         """Закрытие диалогового окна"""
-        # Отображаем диалоговое окно с сообщением
-        message = f"После закрытия окна основной интерфейс будет обновлен\nс учетом удаленных данных."
-        wx.MessageBox(message, "Оповещение", wx.OK | wx.ICON_INFORMATION)
+        # # Отображаем диалоговое окно с сообщением
+        # message = f"После закрытия окна основной интерфейс будет обновлен\nс учетом удаленных данных."
+        # wx.MessageBox(message, "Оповещение", wx.OK | wx.ICON_INFORMATION)
 
         # Вызываем стандартное событие закрытия окна
         self.Destroy()
         event.Skip()
 
-        # Получаем объект главного окна приложения
-        main_obj = self.parent_dialog
-        # Обновляем данные в главном окне
-        main_obj.update_main_window(self)
+        # # Получаем объект главного окна приложения
+        # main_obj = self.parent_dialog
+        # # Обновляем данные в главном окне
+        # main_obj.update_main_window(self)
 
 
 ###########################################################################
@@ -207,6 +208,11 @@ class PanelDelModule(wx.Panel):
             self.scrolled_window.Layout()
             self.Layout()
 
+        # Получаем объект главного окна приложения
+        main_obj_window = self.GetParent().GetParent()
+        # Обновляем данные в главном окне)
+        main_obj_window.update_main_window(self)
+
 
 ###########################################################################
 # Class PanelDelCommand
@@ -270,7 +276,7 @@ class PanelDelCommand(wx.Panel):
         lst_cmd = database_queries.request_get_commands(name_mod)
         sizer_all_cmd = tab.scrol_wind.GetSizer()  # Получаем из scrol_wind(скроллинг) дочерний сайзер sizer_all_cmd (сайзер для списка команд)
 
-        # если сайзер не пустой очищаем, во избежании добавления команд после перезагрузки списка
+        # Если сайзер не пустой, очищаем, во избежании добавления команд после перезагрузки списка
         if sizer_all_cmd.GetChildren():
             sizer_all_cmd = tab.scrol_wind.GetSizer()  # Получаем сайзер со всеми командами
             sizer_all_cmd.Clear(delete_windows=True)  # Очищаем сайзер от старых данных
@@ -308,3 +314,7 @@ class PanelDelCommand(wx.Panel):
         # Обновляем расположение элементов в вкладке
         tab.scrol_wind.Layout()
         tab.Layout()
+        # Получаем объект главного окна приложения
+        main_obj_window = self.GetParent().GetParent()
+        # Обновляем данные в главном окне)
+        main_obj_window.update_main_window(self)
