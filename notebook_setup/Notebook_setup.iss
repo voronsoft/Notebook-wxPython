@@ -59,20 +59,23 @@ Name: "{localappdata}\Notebook"
 Name: "{localappdata}\Notebook\Logs"
 ; Указана папка Documents - {userdocs}
 Name: "{userdocs}\Notebook-export-json"
+Name: "{userdocs}\Notebook-pdf"
+
+
 
 [UninstallDelete]
 ; Удалить все файлы и директории при деинсталляции программы
-
+Type: filesandordirs; Name: "{app}"
 Type: filesandordirs; Name: "{app}\db"
 Type: filesandordirs; Name: "{app}\img"
 Type: filesandordirs; Name: "{app}\icons"
-Type: filesandordirs; Name: "{app}"
 Type: filesandordirs; Name: "{localappdata}\Notebook"
 Type: filesandordirs; Name: "{userdocs}\Notebook-export-json"
 Type: filesandordirs; Name: "{userdocs}\Notebook-pdf"
 
 [Files]
 ; Все что в этих директориях в папке инсталятора будет перенесенно в папку с устанавливаемым приложением
+Source: "{#MyFolder}\Source\Notebook-pdf\*"; DestDir: "{userdocs}\Notebook-pdf"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#MyFolder}\Source\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#MyFolder}\Source\db\*"; DestDir: "{app}\db"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#MyFolder}\Source\img\*"; DestDir: "{app}\img"; Flags: ignoreversion recursesubdirs createallsubdirs
