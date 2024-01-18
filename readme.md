@@ -13,7 +13,8 @@ Notebook-setup-1.0.exe
 PS.  
 Полезные заметки по проекту смотреть в - readme_notes.txt
 
-Фото приложения:
+Фото приложения:  
+
 ![main.png](img%2Fmain.png)  
 
 ![2.png](img%2F2.png)  
