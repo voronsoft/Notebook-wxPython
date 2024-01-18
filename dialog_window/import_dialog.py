@@ -16,7 +16,7 @@ from utils.database_queries import import_data_json_from_db
 class ImportDialog(wx.Dialog):
 
     def __init__(self, parent):
-        wx.Dialog.__init__(self, parent, id=wx.ID_ANY, title="Импорт", pos=wx.DefaultPosition, size=wx.Size(-1, -1), style=wx.DEFAULT_FRAME_STYLE)
+        wx.Dialog.__init__(self, parent, id=wx.ID_ANY, title="Импорт", pos=wx.DefaultPosition, size=wx.Size(600, 600), style=wx.DEFAULT_FRAME_STYLE)
 
         self.parent_dialog = self.GetParent()  # Родитель окна
 

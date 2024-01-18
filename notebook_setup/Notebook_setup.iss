@@ -69,6 +69,7 @@ Type: filesandordirs; Name: "{app}\icons"
 Type: filesandordirs; Name: "{app}"
 Type: filesandordirs; Name: "{localappdata}\Notebook"
 Type: filesandordirs; Name: "{userdocs}\Notebook-export-json"
+Type: filesandordirs; Name: "{userdocs}\Notebook-pdf"
 
 [Files]
 ; Все что в этих директориях в папке инсталятора будет перенесенно в папку с устанавливаемым приложением

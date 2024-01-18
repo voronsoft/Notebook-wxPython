@@ -1,6 +1,8 @@
 import os
 import wx
 import wx.xrc
+
+from dialog_window.pdf_viewer_dialog import BooksDialog
 from logs.app_logger import logger_debug
 from dialog_window import documentation_dialog
 from dialog_window.import_dialog import ImportDialog
@@ -56,7 +58,7 @@ class FrameMain(wx.Frame):
         self.SetBackgroundColour(wx.Colour(255, 255, 255))  # Установка цвета фона окна (белый)
         self.SetFont(wx.Font(12, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
 
-        self.SetMinSize(wx.Size(600, 600))  # Устанавливаем минимальные размеры окна
+        self.SetMinSize(wx.Size(800, 600))  # Устанавливаем минимальные размеры окна
         # Устанавливаем иконку для окна
         icon = wx.Icon(f'{os.path.join(icons_folder_path, "notebook.ico")}', wx.BITMAP_TYPE_ICO)
         self.SetIcon(icon)
@@ -169,6 +171,13 @@ class FrameMain(wx.Frame):
         self.search_button.SetBitmap(wx.Bitmap(os.path.join(icons_folder_path, "search24.png"), wx.BITMAP_TYPE_ANY))
         self.search_button.SetFont(wx.Font(14, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
         sizer_top_button.Add(self.search_button, 1, wx.ALL | wx.EXPAND, 5)
+        # Кнопка - "Полезное PDF"
+        self.view_pdf_button = wx.Button(self, wx.ID_ANY, "Полезное", wx.DefaultPosition, wx.DefaultSize, 0)
+        self.view_pdf_button.SetLabelMarkup("Полезное")
+        self.view_pdf_button.SetBitmap(wx.Bitmap(os.path.join(icons_folder_path, "book24.png"), wx.BITMAP_TYPE_ANY))
+        self.view_pdf_button.SetFont(wx.Font(14, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
+        sizer_top_button.Add(self.view_pdf_button, 1, wx.ALL | wx.EXPAND, 5)
+
         sizerMain.Add(sizer_top_button, 0, wx.EXPAND, 5)  # Добавляем сайзер TOP в главный сайзер MAIN
 
         # -----------------------------------------------------------
@@ -182,7 +191,6 @@ class FrameMain(wx.Frame):
 
         # Если данных нет то загружаем панель документации
         elif get_module_count() == 0:
-            print('Загружаем документацию')
             sizer_data = wx.BoxSizer(wx.VERTICAL)
             start_dialog_doc = documentation_dialog.DocumentationPanel(self)
             sizer_data.Add(start_dialog_doc, 0, wx.EXPAND, 5)
@@ -221,6 +229,7 @@ class FrameMain(wx.Frame):
         self.edit_button_data.Bind(wx.EVT_LEFT_DOWN, self.edit_data_button_click)  # Изменить
         self.del_button_data.Bind(wx.EVT_LEFT_DOWN, self.del_data_button_click)  # Удалить
         self.search_button.Bind(wx.EVT_LEFT_DOWN, self.search)  # Поиск
+        self.view_pdf_button.Bind(wx.EVT_LEFT_DOWN, self.view_pdf_files)  # Полезное PDF
         self.close_button.Bind(wx.EVT_BUTTON, self.close_program)  # Закрыть программу
         self.Bind(wx.EVT_CLOSE, self.close_program)  # Закрытие программы нажатие значка верхний правый угол
         self.upd_szr_data_button.Bind(wx.EVT_BUTTON, self.update_main_window)  # Обновить данные в сайзере DATA
@@ -249,6 +258,12 @@ class FrameMain(wx.Frame):
     def search(self, event):
         """Открытие диалога поиска"""
         search_dialog = SearchDialog(self)
+        search_dialog.ShowModal()
+        search_dialog.Destroy()
+
+    def view_pdf_files(self, event):
+        """Открытие диалога поиска"""
+        search_dialog = BooksDialog(self)
         search_dialog.ShowModal()
         search_dialog.Destroy()
 

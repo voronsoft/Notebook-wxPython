@@ -476,7 +476,6 @@ def export_data_db_to_json_file(name_text_module=None, gauge=None):
                 return 'error'
 
             if json_data:
-                print(json_data)
                 try:
                     # Определяем путь для сохранения файла по пути в операционной системе - C:\Users\user\Documents\Notebook-export-json\all_data.json
                     file_path = os.path.join(os.path.expanduser('~'), 'Documents', 'Notebook-export-json', f'{name_text_module}.json')
