@@ -290,6 +290,19 @@ class DocumentationDialog(wx.Dialog):
         self.m_staticline18 = wx.StaticLine(self.m_scrolledWindow1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL)
         bSizer4.Add(self.m_staticline18, 0, wx.EXPAND | wx.ALL, 20)
 
+        self.m_staticText31 = wx.StaticText(self.m_scrolledWindow1, wx.ID_ANY, "Полезное", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTER_HORIZONTAL)
+        self.m_staticText31.Wrap(-1)
+
+        self.m_staticText31.SetFont(wx.Font(12, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Arial"))
+
+        bSizer4.Add(self.m_staticText31, 0, wx.ALIGN_CENTER | wx.ALL, 5)
+
+        self.m_bitmap24 = wx.StaticBitmap(self.m_scrolledWindow1, wx.ID_ANY, wx.Bitmap(os.path.join(img_folder_path, "15.png"), wx.BITMAP_TYPE_ANY), wx.DefaultPosition, wx.DefaultSize, 0)
+        bSizer4.Add(self.m_bitmap24, 0, wx.ALIGN_CENTER | wx.ALL, 5)
+
+        self.m_bitmap25 = wx.StaticBitmap(self.m_scrolledWindow1, wx.ID_ANY, wx.Bitmap(os.path.join(img_folder_path, "16.png"), wx.BITMAP_TYPE_ANY), wx.DefaultPosition, wx.DefaultSize, 0)
+        bSizer4.Add(self.m_bitmap25, 0, wx.ALIGN_CENTER | wx.ALL, 5)
+
         self.m_scrolledWindow1.SetSizer(bSizer4)
         self.m_scrolledWindow1.Layout()
         bSizer4.Fit(self.m_scrolledWindow1)
